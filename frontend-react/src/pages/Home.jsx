@@ -126,7 +126,7 @@ function MoverRow({ item, isGainer }) {
   return (
     <Link
       to={`/analyse?ticker=${item.ticker}`}
-      className="screener-row flex items-center justify-between py-3 px-3 rounded-xl -mx-3 transition-all duration-200 group hover:bg-[rgba(79,142,247,0.05)]"
+      className="mover-card screener-row flex items-center justify-between py-3 px-3 rounded-xl -mx-3 group"
       style={{ color: 'inherit' }}
     >
       <div className="flex items-center gap-3">
@@ -590,28 +590,26 @@ export default function Home() {
               <>
                 <Link
                   to="/screener"
-                  className="hero-cta inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="hero-cta hero-cta-primary inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold"
                   style={{
                     background: 'var(--accent)',
                     color: '#0a0f1e',
                     boxShadow: '0 0 32px rgba(124,255,203,0.3)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 48px rgba(124,255,203,0.5)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 32px rgba(124,255,203,0.3)'; e.currentTarget.style.transform = 'none' }}
+
                 >
                   <Search size={15} /> Screener starten
                 </Link>
                 <Link
                   to="/analyse"
-                  className="hero-cta inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="hero-cta hero-cta-primary inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold"
                   style={{
                     background: 'rgba(255,255,255,0.05)',
                     color: 'var(--text)',
                     border: '1px solid rgba(255,255,255,0.1)',
                     backdropFilter: 'blur(8px)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'none' }}
+
                 >
                   <Brain size={15} /> Aktie analysieren
                 </Link>
@@ -620,27 +618,25 @@ export default function Home() {
               <>
                 <Link
                   to="/auth"
-                  className="hero-cta inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="hero-cta hero-cta-primary inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold"
                   style={{
                     background: 'var(--accent)',
                     color: '#0a0f1e',
                     boxShadow: '0 0 32px rgba(124,255,203,0.3)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 48px rgba(124,255,203,0.5)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 32px rgba(124,255,203,0.3)'; e.currentTarget.style.transform = 'none' }}
+
                 >
                   Kostenlos starten <ChevronRight size={15} />
                 </Link>
                 <Link
                   to="/screener"
-                  className="hero-cta inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="hero-cta hero-cta-primary inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold"
                   style={{
                     background: 'rgba(255,255,255,0.05)',
                     color: 'var(--text)',
                     border: '1px solid rgba(255,255,255,0.1)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'none' }}
+
                 >
                   Demo ansehen
                 </Link>
@@ -706,10 +702,9 @@ export default function Home() {
               {!loading && (
                 <button
                   onClick={loadData}
-                  className="inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 -mr-3 rounded-lg text-xs transition-colors duration-200"
+                  className="market-refresh inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 -mr-3 rounded-lg text-xs"
                   style={{ color: 'var(--text-muted)' }}
-                  onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+
                   aria-label="Marktdaten aktualisieren"
                 >
                   <RefreshCw size={12} /> Aktualisieren
@@ -951,14 +946,13 @@ export default function Home() {
               </p>
               <Link
                 to={user ? '/screener' : '/auth'}
-                className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl text-base font-semibold transition-all duration-200"
+                className="hero-cta hero-cta-primary hero-cta-large inline-flex items-center gap-2 px-10 py-4 rounded-2xl text-base font-semibold"
                 style={{
                   background: 'var(--accent)',
                   color: '#0a0f1e',
                   boxShadow: '0 0 48px rgba(124,255,203,0.35)',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 64px rgba(124,255,203,0.55)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 48px rgba(124,255,203,0.35)'; e.currentTarget.style.transform = 'none' }}
+
               >
                 {user ? 'Screener starten' : 'Kostenlos starten'} <ChevronRight size={18} />
               </Link>

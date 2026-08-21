@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-08-21 — Home Hover → CSS
+
+- `Home.jsx` — Inline-`onMouseEnter`/`onMouseLeave`-Handler für MoverRows, Hero-CTAs, Aktualisieren-Button und unteren CTA entfernt.
+- `index.css` — Hover-Zustände als CSS-Klassen (`.mover-card`, `.hero-cta`, `.market-refresh`) mit `cubic-bezier(0.22, 1, 0.36, 1)` umgesetzt.
+- Keine React-Logik, Navigation oder API-Aufrufe geändert.
+
+**Build:** ✅ `npm run build`
+
+---
+
 ## 2026-08-21 — Settings Key-Vorschau
 
 - `Settings.jsx` zeigt konfigurierte API-Keys als maskierte Vorschau mit Präfix und letzten vier Zeichen.

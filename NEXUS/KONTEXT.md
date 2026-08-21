@@ -1,6 +1,6 @@
 # NEXUS Investment Suite — Vollständiger Projektkontext
 
-> Letzte Aktualisierung: 2026-04-07 | Stand: WS-Fix + Recovery-Flow + Cold-Start-UX + NaN-Guards + Design Quick Wins + AI Chat + GSAP Refactor
+> Letzte Aktualisierung: 2026-08-21 | Stand: Home Hover → CSS + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
 
 ---
 
@@ -240,8 +240,8 @@ WebSocket nur für Progress-Anzeige.
 4. ~~Error Boundaries in `App.jsx`~~ ✅ vorhanden (jede Route gewrapped)
 5. ~~"Passwort vergessen" Flow in Auth.jsx~~ ✅ vorhanden (`resetPasswordForEmail` + Recovery-Hash)
 6. ~~Settings.jsx Key-Anzeige nach Reload (`gsk_****` Vorschau)~~ ✅ erledigt 2026-08-21 (maskierte Vorschau, Aufdecken, Copy)
-7. Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen ← OFFEN
-8. Analysis.jsx Regex-Parsing robuster machen ← OFFEN
+7. ~~Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen~~ ✅ erledigt 2026-08-21
+8. Analysis.jsx Regex-Parsing robuster machen ← NÄCHSTER TASK
 
 ➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 

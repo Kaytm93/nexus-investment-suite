@@ -64,6 +64,40 @@
 /* ── Components ────────────────────────────────────────────────────────────── */
 @layer components {
 
+  .mover-card {
+    background: transparent;
+    transition: background 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mover-card:hover {
+    background: rgba(79, 142, 247, 0.05);
+  }
+
+  .hero-cta {
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+                background 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero-cta-primary:hover {
+    box-shadow: 0 0 48px rgba(124, 255, 203, 0.5) !important;
+    transform: translateY(-2px);
+  }
+  .hero-cta-secondary:hover,
+  .hero-cta[style*="255, 255, 255"]:hover {
+    background: rgba(255, 255, 255, 0.09) !important;
+    box-shadow: none !important;
+    transform: translateY(-2px);
+  }
+  .hero-cta-large:hover {
+    box-shadow: 0 0 64px rgba(124, 255, 203, 0.55) !important;
+  }
+
+  .market-refresh {
+    transition: color 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .market-refresh:hover {
+    color: var(--primary) !important;
+  }
+
   .btn-primary {
     @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed;
     background: var(--accent);

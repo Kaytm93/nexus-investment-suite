@@ -1,6 +1,6 @@
 # NEXUS — Bug-Tracker & Problemliste
 
-> Letzte Aktualisierung: 2026-04-05 (Session 3)
+> Letzte Aktualisierung: 2026-08-21 (Task 2)
 
 ---
 
@@ -13,6 +13,8 @@
 ## 🟡 In Arbeit
 
 *(Aktuell keine Bugs in aktiver Bearbeitung)*
+
+Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festgestellt.
 
 ---
 
