@@ -242,6 +242,7 @@ WebSocket nur für Progress-Anzeige.
 6. ~~Settings.jsx Key-Anzeige nach Reload (`gsk_****` Vorschau)~~ ✅ erledigt 2026-08-21 (maskierte Vorschau, Aufdecken, Copy)
 7. ~~Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen~~ ✅ erledigt 2026-08-21
 8. ~~Analysis.jsx Regex-Parsing robuster machen~~ ✅ erledigt 2026-08-21 (flexible Labels, lokalisierte Währungen/Zahlen, sichere Fallbacks)
+9. ~~Screener CSV-Export~~ ✅ erledigt 2026-08-21 (BOM, Semikolon-Separator, Excel-kompatibler Download)
 
 ➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 

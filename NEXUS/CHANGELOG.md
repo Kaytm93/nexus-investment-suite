@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-08-21 — Screener CSV-Export
+
+- `Screener.jsx` — CSV-Download-Button neben der Elara-Ergebnistabelle ergänzt.
+- Exportiert Tabellenkopf und Ergebniszeilen mit UTF-8-BOM, Semikolon-Separator und korrekt escaped CSV-Zellen für deutsches Excel.
+- Der bestehende GSAP-Row-Stagger nutzt jetzt `useGSAP()` gemäß Design-Regel; Ticker werden vor der Analyse-Navigation mit `.toUpperCase().trim()` normalisiert.
+
+**Build:** ✅ `npm run build`
+
+---
+
 ## 2026-08-21 — Analysis Regex robuster
 
 - `Analysis.jsx` — `extractReportSections` akzeptiert flexible deutsche und englische Labels für Conviction, Timing, Kurs und DCF-Szenarien.

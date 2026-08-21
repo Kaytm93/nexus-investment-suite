@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import ApiKeyGate from '../components/ApiKeyGate'
 import { runElaraScreener } from '../lib/api'
+import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import {
   Search, Loader2, AlertCircle, ChevronRight, Info,
@@ -59,6 +60,25 @@ function parseMarkdownTable(markdown) {
   ).filter(row => row.length > 0)
 
   return { headers, rows }
+}
+
+function buildCsvContent(headers, rows) {
+  const escapeCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`
+  return '\uFEFF' + [headers, ...rows]
+    .map(row => row.map(escapeCell).join(';'))
+    .join('\r\n')
+}
+
+function downloadCsv(headers, rows, filename) {
+  const blob = new Blob([buildCsvContent(headers, rows)], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
 }
 
 function SortIcon({ column, sortCol, sortDir }) {
@@ -178,14 +198,14 @@ export default function Screener() {
   const progressRef = useRef(null)
 
   // GSAP row stagger when results arrive
-  useEffect(() => {
+  useGSAP(() => {
     if (result) {
       gsap.fromTo('.screener-row',
         { opacity: 0, x: -16 },
         { opacity: 1, x: 0, stagger: 0.04, duration: 0.35, ease: 'power2.out' }
       )
     }
-  }, [result])
+  }, { dependencies: [result] })
 
   const handleChange = (field, value) => {
     setForm(f => ({ ...f, [field]: value }))
@@ -225,13 +245,20 @@ export default function Screener() {
   }
 
   const handleTickerClick = (ticker) => {
-    navigate(`/analyse?ticker=${ticker.trim()}`)
+    navigate(`/analyse?ticker=${ticker.toUpperCase().trim()}`)
+  }
+
+  const handleCsvDownload = () => {
+    const sectorName = SECTORS.find(s => s.value === form.sector)?.label || 'elara-ergebnisse'
+    const filename = `elara-${sectorName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.csv`
+    downloadCsv(headers, rows, filename)
   }
 
   // Extract markdown table from result
   const reportText = result?.result || result?.report || result?.text || ''
   const tableMatch = reportText.match(/((?:\|[^\n]+\|\n?)+)/m)
   const tableMarkdown = tableMatch ? tableMatch[0] : ''
+  const { headers, rows } = parseMarkdownTable(tableMarkdown)
   const nonTableText = result ? extractNonTable(reportText) : ''
 
   return (
@@ -414,9 +441,20 @@ export default function Screener() {
                       <h2 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
                         Ergebnisse — {SECTORS.find(s => s.value === form.sector)?.label}
                       </h2>
-                      <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-                        <Info size={12} />
-                        Klicke auf Ticker für Deep-Dive
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+                          <Info size={12} />
+                          Klicke auf Ticker für Deep-Dive
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCsvDownload}
+                          className="btn-secondary text-xs py-1.5 px-2.5"
+                          title="Ergebnisse als CSV für Excel herunterladen"
+                        >
+                          <Download size={13} />
+                          CSV Export
+                        </button>
                       </div>
                     </div>
                     <div className="card-body p-0">

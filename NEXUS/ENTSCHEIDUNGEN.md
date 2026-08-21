@@ -4,6 +4,19 @@
 
 ---
 
+## Elara-Screener-Export als semikolon-separierte CSV
+**Datum:** 2026-08-21 (Task 4)
+**Status:** aktiv
+
+**Warum:** Nutzer in Deutschland öffnen Exporte typischerweise direkt in Excel; Semikolon wird dort als Spaltentrenner erkannt und ein UTF-8-BOM bewahrt Umlaute korrekt.
+
+**Konsequenz:**
+- Der Frontend-Export nutzt ausschließlich die aktuell gerenderte Elara-Markdown-Tabelle.
+- Jede Zelle wird quotiert und doppelte Anführungszeichen werden CSV-konform escaped.
+- Der Download erfolgt clientseitig als Blob ohne localStorage/sessionStorage.
+
+---
+
 ## Groq-Key unter "claude"-Slot gespeichert
 **Datum:** 2026-03 (Commit `d015e9d`)
 **Status:** aktiv — NICHT ändern

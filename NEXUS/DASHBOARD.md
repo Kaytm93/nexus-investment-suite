@@ -1,17 +1,17 @@
 # NEXUS — Dashboard
 
-> Zuletzt aktualisiert: 2026-08-21 · Task 3 Analysis Regex robuster abgeschlossen
+> Zuletzt aktualisiert: 2026-08-21 · Task 4 Screener CSV-Export abgeschlossen
 
 ---
 
 ## 🚦 Projektstatus
 
-**Vault-Sync 2026-08-21: Task 3 Analysis Regex robuster umgesetzt. Flexible Feld-Labels, lokalisierte Zahlen/Währungen und sichere Fallbacks sind aktiv; Build ✅.**
+**Vault-Sync 2026-08-21: Task 4 Screener CSV-Export umgesetzt. Elara-Ergebnisse können Excel-kompatibel mit BOM und Semikolon-Separator exportiert werden; Build ✅.**
 
 ### Was gerade läuft
 
-- Task 1 **Settings Key-Vorschau**, Task 2 **Home Hover → CSS** und Task 3 **Analysis Regex robuster** sind abgeschlossen; Build, Commit und Push sind erfolgt.
-- Nächster Queue-Task: **Screener CSV-Export**.
+- Task 1 **Settings Key-Vorschau**, Task 2 **Home Hover → CSS**, Task 3 **Analysis Regex robuster** und Task 4 **Screener CSV-Export** sind abgeschlossen; Build, Commit und Push sind erfolgt.
+- Nächster Queue-Task: **Altair Cache-Indikator**.
 
 ---
 
@@ -23,7 +23,7 @@
 |---|---|---|---|
 | Home | `/` | ✅ fertig | Dark Hero, GSAP ScrollTrigger, Markt-Indices, Gainers/Losers |
 | Auth | `/auth` | ✅ fertig | Supabase Login + Register, kein "Passwort vergessen" (offener Bug) |
-| Screener | `/screener` | ✅ fertig | Elara, Dark Theme komplett, GSAP Row-Stagger |
+| Screener | `/screener` | ✅ fertig | Elara, Dark Theme komplett, GSAP Row-Stagger, CSV-Export |
 | Analysis | `/analyse` | ✅ fertig | Altair, WebSocket Progress, DCF Chart, Conviction Gauge |
 | Portfolio | `/portfolio` | ✅ fertig | Dark Theme komplett, CRUD Positionen, Performance Chart |
 | Settings | `/settings` | ✅ fertig | Groq / Claude / Tavily Key-Management |
@@ -72,7 +72,7 @@
 1. [x] **Settings Key-Vorschau** — Gespeicherte Keys als Maskiert-Preview anzeigen (`gsk_****…abc4`), Toggle zum Aufdecken, Copy-Button. Nur Frontend (`pages/Settings.jsx`, `/api/keys/status` liest vorhandene Flags). Abgeschlossen 2026-08-21.
 2. [x] **Home Hover → CSS** — Inline `onMouseEnter/onMouseLeave`-Handler in Home.jsx (MoverRows/Buttons, ca. Zeilen 595–635) durch CSS-Klassen ersetzen (`.mover-card:hover` etc., easing `cubic-bezier(0.22,1,0.36,1)`). Rein visuell, keine Logik ändern. Abgeschlossen 2026-08-21.
 3. [x] **Analysis Regex robuster** — `extractReportSections` + Feld-Extraktion (Conviction/Timing/Preis/DCF-Zeilen) toleranter gemacht: flexible Labels (dt./engl.), Tausenderpunkte, €/$-Zeichen, fehlende Felder → saubere Fallbacks statt Crash. Keine Output-Inhalte geändert. Abgeschlossen 2026-08-21.
-4. [ ] **Screener CSV-Export** — Elara-Ergebnisse als CSV-Download (Button neben Ergebnis-Tabelle, BOM für Excel, Semikolon-Separator für DE-Excel).
+4. [x] **Screener CSV-Export** — Elara-Ergebnisse als CSV-Download (Button neben Ergebnis-Tabelle, BOM für Excel, Semikolon-Separator für DE-Excel). Abgeschlossen 2026-08-21.
 5. [ ] **Altair Cache-Indikator** — Backend: Report-Cache-Alter im Response mitliefern (`cached_at` ISO). Frontend: Badge „Stand: vor X Min./Stdn." + „Neu analysieren"-Button nutzt vorhandenes `force_refresh`.
 6. [ ] **Portfolio Transaktions-History** — Kaufhistorie je Position (Backend: Tabelle/Feld + Endpunkte, Supabase + SQLite-Fallback; Frontend: History-Tab im Positions-Modal).
 7. [ ] **Echte Live-Kurse** — Backend-Polling yFinance alle 60s (Cache mit TTL), SSE-Endpoint `/api/market/stream`; Home Indices + Portfolio aktualisieren sich live. yFinance-NaN-Guards beachten ([[PROBLEME]]).
