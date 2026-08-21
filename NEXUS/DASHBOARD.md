@@ -1,17 +1,17 @@
 # NEXUS — Dashboard
 
-> Zuletzt aktualisiert: 2026-08-21 · Task 2 Home Hover → CSS abgeschlossen
+> Zuletzt aktualisiert: 2026-08-21 · Task 3 Analysis Regex robuster abgeschlossen
 
 ---
 
 ## 🚦 Projektstatus
 
-**Vault-Sync 2026-08-21: Task 2 Home Hover → CSS umgesetzt. Bundle-Size ✅ (manualChunks aktiv, Build sauber), Error Boundaries ✅ und Passwort-Vergessen ✅. Als Nächstes ist Task 3 aktiv.**
+**Vault-Sync 2026-08-21: Task 3 Analysis Regex robuster umgesetzt. Flexible Feld-Labels, lokalisierte Zahlen/Währungen und sichere Fallbacks sind aktiv; Build ✅.**
 
 ### Was gerade läuft
 
-- Task 1 **Settings Key-Vorschau** und Task 2 **Home Hover → CSS** sind abgeschlossen; Build, Commit und Push erfolgen in dieser Session.
-- Nächster Queue-Task: **Analysis Regex robuster**.
+- Task 1 **Settings Key-Vorschau**, Task 2 **Home Hover → CSS** und Task 3 **Analysis Regex robuster** sind abgeschlossen; Build, Commit und Push sind erfolgt.
+- Nächster Queue-Task: **Screener CSV-Export**.
 
 ---
 
@@ -71,7 +71,7 @@
 **Queue (nächster freier = aktiver):**
 1. [x] **Settings Key-Vorschau** — Gespeicherte Keys als Maskiert-Preview anzeigen (`gsk_****…abc4`), Toggle zum Aufdecken, Copy-Button. Nur Frontend (`pages/Settings.jsx`, `/api/keys/status` liest vorhandene Flags). Abgeschlossen 2026-08-21.
 2. [x] **Home Hover → CSS** — Inline `onMouseEnter/onMouseLeave`-Handler in Home.jsx (MoverRows/Buttons, ca. Zeilen 595–635) durch CSS-Klassen ersetzen (`.mover-card:hover` etc., easing `cubic-bezier(0.22,1,0.36,1)`). Rein visuell, keine Logik ändern. Abgeschlossen 2026-08-21.
-3. [ ] **Analysis Regex robuster** — `extractReportSections` + Feld-Extraktion (Conviction/Timing/Preis/DCF-Zeilen) toleranter machen: flexible Labels (dt./engl.), Tausenderpunkte, €/$-Zeichen, fehlende Felder → saubere Fallbacks statt Crash. Keine Output-Inhalte ändern.
+3. [x] **Analysis Regex robuster** — `extractReportSections` + Feld-Extraktion (Conviction/Timing/Preis/DCF-Zeilen) toleranter gemacht: flexible Labels (dt./engl.), Tausenderpunkte, €/$-Zeichen, fehlende Felder → saubere Fallbacks statt Crash. Keine Output-Inhalte geändert. Abgeschlossen 2026-08-21.
 4. [ ] **Screener CSV-Export** — Elara-Ergebnisse als CSV-Download (Button neben Ergebnis-Tabelle, BOM für Excel, Semikolon-Separator für DE-Excel).
 5. [ ] **Altair Cache-Indikator** — Backend: Report-Cache-Alter im Response mitliefern (`cached_at` ISO). Frontend: Badge „Stand: vor X Min./Stdn." + „Neu analysieren"-Button nutzt vorhandenes `force_refresh`.
 6. [ ] **Portfolio Transaktions-History** — Kaufhistorie je Position (Backend: Tabelle/Feld + Endpunkte, Supabase + SQLite-Fallback; Frontend: History-Tab im Positions-Modal).

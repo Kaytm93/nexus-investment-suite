@@ -214,31 +214,69 @@ function TickerSearch({ value, onChange, onSelect }) {
 }
 
 // ─── Extract sections from full report text ───────────────────────────────────
+const NUMBER_PATTERN = '[€$£]?\\s*[-+]?\\d[\\d\\s.,]*'
+
+function parseReportNumber(value) {
+  if (!value) return null
+  const normalized = value.replace(/[€$£\s]/g, '')
+  const lastComma = normalized.lastIndexOf(',')
+  const lastDot = normalized.lastIndexOf('.')
+  let number = normalized
+
+  // Treat the last separator as the decimal separator when both are present,
+  // otherwise a single separator followed by exactly two digits is decimal.
+  if (lastComma >= 0 && lastDot >= 0) {
+    const decimal = lastComma > lastDot ? ',' : '.'
+    const thousands = decimal === ',' ? '.' : ','
+    number = normalized.replace(new RegExp(`\\${thousands}`, 'g'), '').replace(decimal, '.')
+  } else if (lastComma >= 0) {
+    number = /,\d{1,2}$/.test(normalized) ? normalized.replace(',', '.') : normalized.replace(/,/g, '')
+  } else if (lastDot >= 0) {
+    number = /\.\d{1,2}$/.test(normalized) ? normalized : normalized.replace(/\./g, '')
+  }
+
+  const parsed = Number(number)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function firstReportNumber(value) {
+  return value?.match(new RegExp(NUMBER_PATTERN))?.[0] || null
+}
+
 function extractReportSections(text) {
-  if (!text) return {}
+  if (typeof text !== 'string' || !text.trim()) return {}
   const sections = {}
+  const lines = text.split(/\r?\n/)
 
-  // Extract conviction score
-  const convMatch = text.match(/Conviction[^:]*(?:Score)?[^:]*:\s*\**(\d+)\**/i)
-  if (convMatch) sections.convictionScore = parseInt(convMatch[1])
+  // Extract conviction score (English/German labels, with or without colon).
+  const convMatch = text.match(/(?:conviction(?:\s+score)?|überzeugung(?:sscore)?|\bscore)\s*(?:score)?\s*[:\-|→]*\s*[*_`]*(\d{1,2})(?:\s*\/?\s*7)?/i)
+  const convictionScore = convMatch ? Number(convMatch[1]) : null
+  if (Number.isFinite(convictionScore)) sections.convictionScore = convictionScore
 
-  // Extract timing signal
-  const timingMatch = text.match(/Timing[^:]*Signal[^:]*:\s*([^\n]+)/i)
-  if (timingMatch) sections.timingSignal = timingMatch[1].trim()
+  // Extract timing signal from flexible English/German labels.
+  const timingMatch = text.match(/(?:timing(?:\s*[-_ ]?\s*signal)?|zeitpunkt|einstiegs(?:zeitpunkt|signal)|signal)\s*[:\-|→]*\s*([^\n|]+)/i)
+  const timingSignal = timingMatch?.[1]?.replace(/[*_`]/g, '').trim()
+  if (timingSignal) sections.timingSignal = timingSignal
 
-  // Extract current price from snapshot table
-  const priceMatch = text.match(/(?:Kurs|Price|Current)[^\|]*\|\s*\$?([\d,. ]+)/i)
-  if (priceMatch) sections.currentPrice = parseFloat(priceMatch[1].replace(/[, ]/g, ''))
+  // Extract current price from a snapshot row or a labelled inline value.
+  const priceMatch = text.match(/(?:^|\n)\s*[^\n]*(?:kurs|aktueller?\s*kurs|current\s*price|price)\s*[^\n|]*\|\s*([^\n|]+)/im)
+    || text.match(/(?:kurs|aktueller?\s*kurs|current\s*price|price)\s*[:\-|→]\s*([^\n|]+)/i)
+  const currentPrice = parseReportNumber(firstReportNumber(priceMatch?.[1]))
+  if (currentPrice !== null) sections.currentPrice = currentPrice
 
-  // Extract DCF scenarios
+  // Extract DCF scenarios. Keep the existing display labels, but accept common
+  // German/English variants and only parse numbers after each scenario label.
   const scenarios = []
-  const dcfText = text.match(/(Bull Case|Base Case|Worst Case|Bear Case)[^\n]+/gi) || []
-  dcfText.forEach(line => {
-    const label = line.match(/Bull Case|Base Case|Worst Case|Bear Case/i)?.[0]
-    const val = line.match(/\$?([\d,.]+)/)?.[1]
-    if (label && val) {
-      scenarios.push({ label, value: parseFloat(val.replace(/,/g, '')) })
-    }
+  const scenarioPattern = /(Bull(?:\s+Case)?|Base(?:\s+Case)?|Worst(?:\s+Case)?|Bear(?:\s+Case)?|Bullen(?:szenario)?|Basisszenario|Bären(?:szenario)?)/i
+  lines.forEach(line => {
+    const scenarioMatch = line.match(scenarioPattern)
+    if (!scenarioMatch) return
+    const value = parseReportNumber(firstReportNumber(line.slice(scenarioMatch.index + scenarioMatch[0].length)))
+    if (value === null) return
+    const rawLabel = scenarioMatch[1].toLowerCase()
+    const label = rawLabel.startsWith('bull') || rawLabel.startsWith('bullen') ? 'Bull Case'
+      : rawLabel.startsWith('base') || rawLabel.startsWith('basis') ? 'Base Case' : rawLabel.startsWith('bear') ? 'Bear Case' : 'Worst Case'
+    scenarios.push({ label, value })
   })
   if (scenarios.length) sections.scenarios = scenarios
 

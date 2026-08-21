@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-08-21 — Analysis Regex robuster
+
+- `Analysis.jsx` — `extractReportSections` akzeptiert flexible deutsche und englische Labels für Conviction, Timing, Kurs und DCF-Szenarien.
+- Lokalisierte Zahlenformate mit Tausenderpunkten/-kommas sowie `€`, `$` und `£` werden sicher geparst.
+- Fehlende oder ungültige Feldwerte führen zu sauberen Fallbacks statt `NaN`/Crash; bestehende Ausgabe-Labels und Inhalte bleiben unverändert.
+
+**Build:** ✅ `npm run build`
+
+---
+
 ## 2026-08-21 — Home Hover → CSS
 
 - `Home.jsx` — Inline-`onMouseEnter`/`onMouseLeave`-Handler für MoverRows, Hero-CTAs, Aktualisieren-Button und unteren CTA entfernt.
