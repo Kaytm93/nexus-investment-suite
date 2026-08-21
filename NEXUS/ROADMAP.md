@@ -9,7 +9,7 @@
 - [ ] `index.css` bereinigen — toten `ticker-scroll` Keyframe entfernen (~5 Min.)
 - [ ] Error Boundaries in `App.jsx` einbauen (mind. um Analysis.jsx wrappen)
 - [ ] "Passwort vergessen" in Auth.jsx — Supabase `resetPasswordForEmail()`
-- [ ] Bundle-Size: `vite.config.js` → `manualChunks` für GSAP + Recharts
+- [x] Bundle-Size: `vite.config.js` → `manualChunks` für GSAP + Recharts ✅ erledigt (verifiziert 2026-08-21: Chunks vendor/gsap/charts/icons/supabase getrennt, keine Vite-Bundle-Warning mehr)
 
 ---
 

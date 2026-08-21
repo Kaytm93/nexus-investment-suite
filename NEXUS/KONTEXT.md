@@ -236,12 +236,14 @@ WebSocket nur für Progress-Anzeige.
 
 1. ~~`index.css` bereinigen~~ ✅ erledigt 2026-04-03
 2. ~~PerformanceChart Dark Theme~~ ✅ erledigt 2026-04-03
-3. Bundle-Size: `vite.config.js` → `manualChunks` für GSAP + Recharts
-4. Error Boundaries in `App.jsx` einbauen (mind. für Analysis.jsx)
-5. "Passwort vergessen" Flow in Auth.jsx (Supabase `resetPasswordForEmail`)
-6. Settings.jsx Key-Anzeige nach Reload (`gsk_****` Vorschau)
-7. Home.jsx MoverRow onMouseEnter → CSS-Klassen
-8. Analysis.jsx Regex-Parsing robuster machen
+3. ~~Bundle-Size: `manualChunks`~~ ✅ verifiziert 2026-08-21 (Chunks getrennt, keine Warning)
+4. ~~Error Boundaries in `App.jsx`~~ ✅ vorhanden (jede Route gewrapped)
+5. ~~"Passwort vergessen" Flow in Auth.jsx~~ ✅ vorhanden (`resetPasswordForEmail` + Recovery-Hash)
+6. Settings.jsx Key-Anzeige nach Reload (`gsk_****` Vorschau) ← OFFEN
+7. Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen ← OFFEN
+8. Analysis.jsx Regex-Parsing robuster machen ← OFFEN
+
+➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 
 ---
 
@@ -297,7 +299,7 @@ WebSocket nur für Progress-Anzeige.
 - `bg-white`, `text-slate-*`, `text-gray-*` in neuen/geänderten Dateien
 - `useEffect` für GSAP-Animationen — immer `useGSAP()` nutzen
 - React-Logik, State oder API-Calls verändern bei rein visuellen Aufgaben
-- Direktes Schreiben in `NEXUS/` — der alte Vault. Nur `_project/` aktualisieren.
+- Direktes Schreiben in andere Vaults — `NEXUS/` IST der aktive Obsidian-Vault dieses Projekts (mit `.obsidian/`). Nach jeder Session gemäß [[START_HIER]] hier aktualisieren.
 
 ### Immer so machen
 - GSAP: `useGSAP(() => { ... }, { dependencies: [data] })` mit `ctx.revert()` via Context
