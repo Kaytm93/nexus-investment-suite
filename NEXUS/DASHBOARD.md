@@ -1,17 +1,17 @@
 # NEXUS — Dashboard
 
-> Zuletzt aktualisiert: 2026-08-21 · Task 4 Screener CSV-Export abgeschlossen
+> Zuletzt aktualisiert: 2026-08-21 · Task 5 Altair Cache-Indikator abgeschlossen
 
 ---
 
 ## 🚦 Projektstatus
 
-**Vault-Sync 2026-08-21: Task 4 Screener CSV-Export umgesetzt. Elara-Ergebnisse können Excel-kompatibel mit BOM und Semikolon-Separator exportiert werden; Build ✅.**
+**Vault-Sync 2026-08-21: Task 5 Altair Cache-Indikator umgesetzt. Altair liefert `cached_at` als ISO-8601-Zeitstempel; die Analyse zeigt Cache-Alter und bietet einen echten `force_refresh`-Button. Build ✅.**
 
 ### Was gerade läuft
 
-- Task 1 **Settings Key-Vorschau**, Task 2 **Home Hover → CSS**, Task 3 **Analysis Regex robuster** und Task 4 **Screener CSV-Export** sind abgeschlossen; Build, Commit und Push sind erfolgt.
-- Nächster Queue-Task: **Altair Cache-Indikator**.
+- Tasks 1–5 sind abgeschlossen; Build und Code-Verifikation sind erfolgt.
+- Nächster Queue-Task: **Portfolio Transaktions-History**.
 
 ---
 
@@ -33,7 +33,7 @@
 | Feature | Status | Notiz |
 |---|---|---|
 | Elara Screener | ✅ | 14 Sektoren, Elara Score 0–100 |
-| Altair Analyse | ✅ | DCF, Conviction 0–7, Timing-Signal, Pre-Mortem |
+| Altair Analyse | ✅ | DCF, Conviction 0–7, Timing-Signal, Pre-Mortem, Cache-Alter + Force-Refresh |
 | Dark Theme | ✅ | Vollständig, alle Pages + Komponenten |
 | Supabase Auth | ✅ | Login, Register, ProtectedRoutes |
 | WebSocket Progress | ✅ | Echtzeit-Fortschritt bei Altair-Analysen |
@@ -73,7 +73,7 @@
 2. [x] **Home Hover → CSS** — Inline `onMouseEnter/onMouseLeave`-Handler in Home.jsx (MoverRows/Buttons, ca. Zeilen 595–635) durch CSS-Klassen ersetzen (`.mover-card:hover` etc., easing `cubic-bezier(0.22,1,0.36,1)`). Rein visuell, keine Logik ändern. Abgeschlossen 2026-08-21.
 3. [x] **Analysis Regex robuster** — `extractReportSections` + Feld-Extraktion (Conviction/Timing/Preis/DCF-Zeilen) toleranter gemacht: flexible Labels (dt./engl.), Tausenderpunkte, €/$-Zeichen, fehlende Felder → saubere Fallbacks statt Crash. Keine Output-Inhalte geändert. Abgeschlossen 2026-08-21.
 4. [x] **Screener CSV-Export** — Elara-Ergebnisse als CSV-Download (Button neben Ergebnis-Tabelle, BOM für Excel, Semikolon-Separator für DE-Excel). Abgeschlossen 2026-08-21.
-5. [ ] **Altair Cache-Indikator** — Backend: Report-Cache-Alter im Response mitliefern (`cached_at` ISO). Frontend: Badge „Stand: vor X Min./Stdn." + „Neu analysieren"-Button nutzt vorhandenes `force_refresh`.
+5. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` als ISO-8601 im Response, Badge mit Cache-Alter, Force-Refresh-Button)
 6. [ ] **Portfolio Transaktions-History** — Kaufhistorie je Position (Backend: Tabelle/Feld + Endpunkte, Supabase + SQLite-Fallback; Frontend: History-Tab im Positions-Modal).
 7. [ ] **Echte Live-Kurse** — Backend-Polling yFinance alle 60s (Cache mit TTL), SSE-Endpoint `/api/market/stream`; Home Indices + Portfolio aktualisieren sich live. yFinance-NaN-Guards beachten ([[PROBLEME]]).
 8. [ ] **Watchlist** — Stars auf Stock-Cards (Home/Screener/Analysis), persistiert in Supabase (Fallback SQLite), Watchlist-Sektion auf Home.

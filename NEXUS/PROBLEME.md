@@ -1,6 +1,6 @@
 # NEXUS — Bug-Tracker & Problemliste
 
-> Letzte Aktualisierung: 2026-08-21 (Task 4)
+> Letzte Aktualisierung: 2026-08-21 (Task 5)
 
 ---
 
@@ -20,6 +20,7 @@ Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festge
 
 ## ✅ Gelöst
 
+- **Altair Cache-Indikator** (2026-08-21 Task 5): Der Altair-Response liefert `cached_at` als UTC-ISO-8601-Zeitstempel für Cache-Hits und frische Reports. Die Analysis-Seite zeigt das Report-Alter und stößt über „Neu analysieren" einen Request mit `force_refresh=true` an.
 - **Screener CSV-Export** (2026-08-21 Task 4): Elara-Ergebnistabelle kann mit UTF-8-BOM und Semikolon-Separator für deutsches Excel heruntergeladen werden.
 - **Analysis Regex-Parsing** (2026-08-21 Task 3): `extractReportSections` akzeptiert flexible deutsche/englische Labels und lokalisierte Zahlen mit Tausendertrennzeichen und Währungssymbolen. Fehlende oder ungültige Conviction-, Timing-, Preis- und DCF-Felder führen zu sicheren Fallbacks statt `NaN`/Crash.
 - **Settings Key-Vorschau** (2026-08-21): `Settings.jsx` zeigt konfigurierte Keys als maskierte Vorschau mit Reveal- und Copy-Button. Die UI nutzt optionale Preview-Felder aus `/api/keys/status`; weil die bestehende Route nur Flags liefert, bleibt ein Key nach Reload aus Sicherheitsgründen nicht aufdeck- oder kopierbar, bis er erneut eingegeben wurde.

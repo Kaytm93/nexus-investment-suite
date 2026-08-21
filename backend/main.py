@@ -10,6 +10,7 @@ import json
 import uuid
 import time
 import asyncio
+from datetime import datetime, timezone
 from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import Optional, Dict, List
@@ -686,6 +687,19 @@ Erstelle jetzt das vollständige Elara-Screening basierend auf diesen Daten."""
 
 # ── Altair Deep Dive ───────────────────────────────────────────────────────────
 
+def _cache_timestamp_iso(value: Optional[str]) -> Optional[str]:
+    """Normalize SQLite's UTC timestamp into an explicit ISO-8601 UTC value."""
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    except (TypeError, ValueError):
+        return None
+
+
 @app.post("/api/altair/analyze")
 @limiter.limit("5/minute")
 async def altair_analyze(request: Request, payload: AltairRequest):
@@ -702,6 +716,7 @@ async def altair_analyze(request: Request, payload: AltairRequest):
             "raw_content": report_data.get("content", report_data.get("raw_content", "")),
             "sources": report_data.get("sources", []),
             "cached": True,
+            "cached_at": _cache_timestamp_iso(cached.get("created_at")),
         }
 
     # 1a. yfinance — strukturierte Finanzdaten (kostenlos, schnell)
@@ -866,6 +881,7 @@ Starte jetzt mit Phase 1: Recherchiere die optimale Bewertungsmethodik für {com
         "sources": sources,
         "ticker": ticker,
     })
+    saved_report = get_altair_report(ticker)
     await manager.send_complete(session_id)
     return {
         "success": True,
@@ -873,6 +889,7 @@ Starte jetzt mit Phase 1: Recherchiere die optimale Bewertungsmethodik für {com
         "raw_content": result["content"],
         "sources": sources,
         "cached": False,
+        "cached_at": _cache_timestamp_iso(saved_report.get("created_at") if saved_report else None),
     }
 
 # ── Auth dependency ────────────────────────────────────────────────────────────

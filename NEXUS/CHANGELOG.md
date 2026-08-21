@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-08-21 — Altair Cache-Indikator
+
+- `backend/main.py` und `models.py` — `cached_at` als UTC-ISO-8601-Zeitstempel für Cache-Hits und frisch gespeicherte Reports ergänzt.
+- `Analysis.jsx` — Badge „Stand: vor X Min./Std." ergänzt und „Neu analysieren" als expliziten `force_refresh`-Button umgesetzt.
+- Veraltete Refresh-Checkbox entfernt; normale Analyse-Aufrufe bleiben cachefähig.
+
+**Build:** ✅ `npm run build`
+
+---
+
 ## 2026-08-21 — Screener CSV-Export
 
 - `Screener.jsx` — CSV-Download-Button neben der Elara-Ergebnistabelle ergänzt.

@@ -104,6 +104,7 @@ class AltairResponse(BaseModel):
     sources: List[str] = Field(default_factory=list)
     error: Optional[str] = None
     cached: bool = Field(default=False, description="True if result served from cache")
+    cached_at: Optional[str] = Field(default=None, description="ISO timestamp of the cached report")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

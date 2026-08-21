@@ -98,6 +98,18 @@ function TimingBadge({ signal }) {
   return <span className="badge badge-red flex items-center gap-1"><XCircle size={11} /> Nur Watchlist</span>
 }
 
+// ─── Cache age label ────────────────────────────────────────────────────────────
+function formatCacheAge(cachedAt) {
+  if (!cachedAt) return null
+  const timestamp = Date.parse(cachedAt)
+  if (Number.isNaN(timestamp)) return null
+  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000))
+  if (minutes < 60) return `vor ${minutes} Min.`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `vor ${hours} Std.`
+  return `vor ${Math.floor(hours / 24)} T.`
+}
+
 // ─── DCF Bar Chart ────────────────────────────────────────────────────────────
 function DCFChart({ scenarios, currentPrice }) {
   if (!scenarios?.length) return null
@@ -319,7 +331,6 @@ export default function Analysis() {
   const navigate = useNavigate()
 
   const [ticker, setTicker] = useState(searchParams.get('ticker') || '')
-  const [forceRefresh, setForceRefresh] = useState(false)
   const [loading, setLoading] = useState(false)
   const [progressStep, setProgressStep] = useState('')
   const [progressLog, setProgressLog] = useState([])   // real WS messages
@@ -379,7 +390,7 @@ export default function Analysis() {
     }
   }, [hasApiKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleAnalyse = async (t = ticker) => {
+  const handleAnalyse = async (t = ticker, refresh = false) => {
     const sym = (t || ticker).trim().toUpperCase()
     if (!sym) return
 
@@ -428,7 +439,7 @@ export default function Analysis() {
 
     try {
       const [res, hist] = await Promise.allSettled([
-        runAltairAnalysis(sym, forceRefresh, sessionId),
+        runAltairAnalysis(sym, refresh, sessionId),
         fetchHistory(sym, '1y').catch(() => null),
       ])
 
@@ -474,13 +485,29 @@ export default function Analysis() {
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>KI-gestützte Value-Analyse mit DCF, Conviction Score und Timing-Signal</p>
           </div>
           {report && (
-            <button
-              onClick={() => window.print()}
-              className="btn-secondary text-sm no-print"
-            >
-              <Printer size={14} />
-              PDF Export
-            </button>
+            <div className="flex items-center gap-2 shrink-0 no-print">
+              {formatCacheAge(report.cached_at) && (
+                <span className="badge badge-yellow flex items-center gap-1" title={report.cached ? 'Aus dem Report-Cache geladen' : 'Zeitpunkt der letzten Analyse'}>
+                  <Clock size={11} />
+                  Stand: {formatCacheAge(report.cached_at)}
+                </span>
+              )}
+              <button
+                onClick={() => handleAnalyse(ticker, true)}
+                disabled={loading}
+                className="btn-secondary text-sm"
+              >
+                <RefreshCw size={14} />
+                Neu analysieren
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="btn-secondary text-sm"
+              >
+                <Printer size={14} />
+                PDF Export
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -510,25 +537,15 @@ export default function Analysis() {
                 onSelect={(sym) => { setTicker(sym); handleAnalyse(sym) }}
               />
               <div className="flex items-center gap-1.5 shrink-0">
-                <label className="flex items-center gap-1.5 cursor-pointer text-xs whitespace-nowrap" style={{ color: 'var(--text-muted)' }}>
-                  <input
-                    type="checkbox"
-                    checked={forceRefresh}
-                    onChange={e => setForceRefresh(e.target.checked)}
-                    className="rounded border-border"
-                  />
-                  <RefreshCw size={11} />
-                  Neu analysieren
-                </label>
+                <button
+                  onClick={() => handleAnalyse()}
+                  disabled={loading || !ticker.trim()}
+                  className="btn-primary shrink-0"
+                >
+                  {loading ? <Loader2 size={15} className="animate-spin" /> : <Brain size={15} />}
+                  {loading ? 'Analysiert…' : 'Analyse starten'}
+                </button>
               </div>
-              <button
-                onClick={() => handleAnalyse()}
-                disabled={loading || !ticker.trim()}
-                className="btn-primary shrink-0"
-              >
-                {loading ? <Loader2 size={15} className="animate-spin" /> : <Brain size={15} />}
-                {loading ? 'Analysiert…' : 'Analyse starten'}
-              </button>
             </div>
 
             {/* Progress — animated WebSocket steps */}

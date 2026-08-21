@@ -243,6 +243,7 @@ WebSocket nur für Progress-Anzeige.
 7. ~~Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen~~ ✅ erledigt 2026-08-21
 8. ~~Analysis.jsx Regex-Parsing robuster machen~~ ✅ erledigt 2026-08-21 (flexible Labels, lokalisierte Währungen/Zahlen, sichere Fallbacks)
 9. ~~Screener CSV-Export~~ ✅ erledigt 2026-08-21 (BOM, Semikolon-Separator, Excel-kompatibler Download)
+10. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` ISO-8601, Alters-Badge, „Neu analysieren" mit `force_refresh`)
 
 ➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 
