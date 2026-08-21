@@ -1,12 +1,17 @@
 # NEXUS — Dashboard
 
-> Zuletzt aktualisiert: 2026-08-21 · Orchestrator-Session (Hermes Agenten-Kette gestartet)
+> Zuletzt aktualisiert: 2026-08-21 · Task 1 Settings Key-Vorschau abgeschlossen
 
 ---
 
 ## 🚦 Projektstatus
 
-**Vault-Sync 2026-08-21: Roadmap/Kontext mit echtem Code-Stand abgeglichen. Bundle-Size ✅ (manualChunks aktiv, Build sauber), Error Boundaries ✅, Passwort-Vergessen ✅ waren bereits fertig. Frische Task-Queue unten — Agenten-Kette arbeitet sie der Reihe nach ab (1 Task = 1 frischer Agent = 1 Commit).**
+**Vault-Sync 2026-08-21: Task 1 Settings Key-Vorschau umgesetzt. Bundle-Size ✅ (manualChunks aktiv, Build sauber), Error Boundaries ✅ und Passwort-Vergessen ✅. Als Nächstes ist Task 2 aktiv.**
+
+### Was gerade läuft
+
+- Task 1 **Settings Key-Vorschau** ist abgeschlossen; Build, Commit und Push sind erfolgreich erfolgt.
+- Nächster Queue-Task: **Home Hover → CSS**.
 
 ---
 
@@ -64,7 +69,7 @@
 > Agenten-Kette: Jeder Task = genau EINER pro Session. Reihenfolge beachten! Nach jeder Task: Vault updaten ([[START_HIER]] End-of-Session-Checkliste), `npm run build` grün, Commit + Push.
 
 **Queue (nächster freier = aktiver):**
-1. [ ] **Settings Key-Vorschau** — Gespeicherte Keys als Maskiert-Preview anzeigen (`gsk_****…abc4`), Toggle zum Aufdecken, Copy-Button. Nur Frontend (`pages/Settings.jsx`, `/api/keys/status` liest vorhandene Flags).
+1. [x] **Settings Key-Vorschau** — Gespeicherte Keys als Maskiert-Preview anzeigen (`gsk_****…abc4`), Toggle zum Aufdecken, Copy-Button. Nur Frontend (`pages/Settings.jsx`, `/api/keys/status` liest vorhandene Flags). Abgeschlossen 2026-08-21.
 2. [ ] **Home Hover → CSS** — Inline `onMouseEnter/onMouseLeave`-Handler in Home.jsx (MoverRows/Buttons, ca. Zeilen 595–635) durch CSS-Klassen ersetzen (`.mover-card:hover` etc., easing `cubic-bezier(0.22,1,0.36,1)`). Rein visuell, keine Logik ändern.
 3. [ ] **Analysis Regex robuster** — `extractReportSections` + Feld-Extraktion (Conviction/Timing/Preis/DCF-Zeilen) toleranter machen: flexible Labels (dt./engl.), Tausenderpunkte, €/$-Zeichen, fehlende Felder → saubere Fallbacks statt Crash. Keine Output-Inhalte ändern.
 4. [ ] **Screener CSV-Export** — Elara-Ergebnisse als CSV-Download (Button neben Ergebnis-Tabelle, BOM für Excel, Semikolon-Separator für DE-Excel).

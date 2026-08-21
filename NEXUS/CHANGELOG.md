@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-08-21 — Settings Key-Vorschau
+
+- `Settings.jsx` zeigt konfigurierte API-Keys als maskierte Vorschau mit Präfix und letzten vier Zeichen.
+- Reveal-Toggle und Copy-Button für den im aktuellen Frontend-State verfügbaren Key ergänzt.
+- `/api/keys/status` bleibt unverändert und wird weiterhin nur über vorhandene Status-Flags bzw. optionale Preview-Felder ausgewertet; keine Secrets in Storage oder Backend-Response ergänzt.
+
+**Build:** ✅ `npm run build`
+
+---
+
 ## 2026-04-05 Session 3 — Altair Output Quality (Klein + Mittel + Groß)
 
 **Commits:** `a38e987`, `aa116a2`

@@ -239,7 +239,7 @@ WebSocket nur für Progress-Anzeige.
 3. ~~Bundle-Size: `manualChunks`~~ ✅ verifiziert 2026-08-21 (Chunks getrennt, keine Warning)
 4. ~~Error Boundaries in `App.jsx`~~ ✅ vorhanden (jede Route gewrapped)
 5. ~~"Passwort vergessen" Flow in Auth.jsx~~ ✅ vorhanden (`resetPasswordForEmail` + Recovery-Hash)
-6. Settings.jsx Key-Anzeige nach Reload (`gsk_****` Vorschau) ← OFFEN
+6. ~~Settings.jsx Key-Anzeige nach Reload (`gsk_****` Vorschau)~~ ✅ erledigt 2026-08-21 (maskierte Vorschau, Aufdecken, Copy)
 7. Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen ← OFFEN
 8. Analysis.jsx Regex-Parsing robuster machen ← OFFEN
 

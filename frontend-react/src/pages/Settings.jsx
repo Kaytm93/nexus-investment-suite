@@ -5,7 +5,7 @@ import {
   saveAlphaVantageKey, checkHealth
 } from '../lib/api'
 import {
-  Key, CheckCircle, XCircle, Loader2, Eye, EyeOff,
+  Key, CheckCircle, XCircle, Loader2, Eye, EyeOff, Copy, Check,
   Globe, Shield, User, AlertTriangle, ChevronDown,
   Zap, Activity, Brain, Sparkles
 } from 'lucide-react'
@@ -120,8 +120,72 @@ function SecretInput({ value, onChange, placeholder, disabled }) {
         style={{ color: 'var(--text-muted)' }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+        aria-label={show ? 'Key verbergen' : 'Key anzeigen'}
       >
         {show ? <EyeOff size={14} /> : <Eye size={14} />}
+      </button>
+    </div>
+  )
+}
+
+function maskApiKey(value) {
+  if (!value) return ''
+  const key = value.trim()
+  if (key.length <= 8) return `${key.slice(0, 3)}****`
+  return `${key.slice(0, 4)}****…${key.slice(-4)}`
+}
+
+function getStatusPreview(status, provider) {
+  const candidates = [
+    status?.[`${provider}_preview`],
+    status?.[`${provider}Preview`],
+    typeof status?.[provider] === 'string' ? status[provider] : null,
+  ]
+  return candidates.find(value => typeof value === 'string' && value.trim()) || ''
+}
+
+function SavedKeyPreview({ value, configured, label = 'Gespeicherter Key' }) {
+  const [revealed, setRevealed] = useState(false)
+  const [copied, setCopied] = useState(false)
+  if (!configured) return null
+
+  const displayValue = value || 'Gespeicherter Key'
+  const canReveal = Boolean(value)
+  const handleCopy = async () => {
+    if (!value || !navigator.clipboard) return
+    await navigator.clipboard.writeText(value)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1600)
+  }
+
+  return (
+    <div className="mt-2 flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(124,255,203,0.05)', border: '1px solid rgba(124,255,203,0.12)' }}>
+      <Key size={13} style={{ color: 'var(--accent)' }} />
+      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</span>
+      <code className="min-w-0 flex-1 truncate text-xs font-mono" style={{ color: 'var(--text)' }}>
+        {revealed && canReveal ? displayValue : (value ? maskApiKey(value) : 'Hinterlegt')}
+      </code>
+      <button
+        type="button"
+        className="shrink-0 transition-colors"
+        onClick={() => canReveal && setRevealed(current => !current)}
+        disabled={!canReveal}
+        style={{ color: canReveal ? 'var(--text-muted)' : 'var(--border)', cursor: canReveal ? 'pointer' : 'not-allowed' }}
+        aria-label={revealed ? 'Key verbergen' : 'Key aufdecken'}
+        title={canReveal ? (revealed ? 'Key verbergen' : 'Key aufdecken') : 'Key kann nach dem Reload nicht aufgedeckt werden'}
+      >
+        {revealed ? <EyeOff size={14} /> : <Eye size={14} />}
+      </button>
+      <button
+        type="button"
+        className="shrink-0 transition-colors"
+        onClick={handleCopy}
+        disabled={!value}
+        style={{ color: value ? (copied ? 'var(--accent)' : 'var(--text-muted)') : 'var(--border)', cursor: value ? 'pointer' : 'not-allowed' }}
+        aria-label="Key kopieren"
+        title={value ? 'Key kopieren' : 'Key ist nach dem Reload nicht verfügbar'}
+      >
+        {copied ? <Check size={14} /> : <Copy size={14} />}
       </button>
     </div>
   )
@@ -194,6 +258,7 @@ export default function Settings() {
   const [tavMsg,    setTavMsg]    = useState('')
 
   const [backendOk, setBackendOk] = useState(null)
+  const [keyPreviews, setKeyPreviews] = useState({})
 
   useEffect(() => {
     const init = async () => {
@@ -201,6 +266,13 @@ export default function Settings() {
       setBackendOk(ok)
       try {
         const status = await getKeyStatus()
+        setKeyPreviews({
+          claude: getStatusPreview(status, 'claude'),
+          openai: getStatusPreview(status, 'openai'),
+          gemini: getStatusPreview(status, 'gemini'),
+          tavily: getStatusPreview(status, 'tavily'),
+          alphavantage: getStatusPreview(status, 'alphavantage'),
+        })
         if (status?.claude)       { setClaudeStatus(true) }
         if (status?.alphavantage) setAvStatus(true)
         if (status?.tavily)       setTavStatus(true)
@@ -225,7 +297,7 @@ export default function Settings() {
     setClaudeSaving(true); setClaudeMsg('')
     try {
       await saveApiKey('claude', claudeKey.trim())
-      setClaudeMsg('Gespeichert.'); setClaudeStatus(true); refreshKeyStatus()
+      setClaudeMsg('Gespeichert.'); setClaudeStatus(true); setKeyPreviews(current => ({ ...current, claude: claudeKey.trim() })); refreshKeyStatus()
     } catch (e) { setClaudeMsg(`Fehler: ${e.message}`) }
     finally { setClaudeSaving(false) }
   }
@@ -244,7 +316,7 @@ export default function Settings() {
     setOpenaiSaving(true); setOpenaiMsg('')
     try {
       await saveApiKey('openai', openaiKey.trim())
-      setOpenaiMsg('Gespeichert.'); setOpenaiStatus(true)
+      setOpenaiMsg('Gespeichert.'); setOpenaiStatus(true); setKeyPreviews(current => ({ ...current, openai: openaiKey.trim() }))
     } catch (e) { setOpenaiMsg(`Fehler: ${e.message}`) }
     finally { setOpenaiSaving(false) }
   }
@@ -263,7 +335,7 @@ export default function Settings() {
     setGeminiSaving(true); setGeminiMsg('')
     try {
       await saveApiKey('gemini', geminiKey.trim())
-      setGeminiMsg('Gespeichert.'); setGeminiStatus(true)
+      setGeminiMsg('Gespeichert.'); setGeminiStatus(true); setKeyPreviews(current => ({ ...current, gemini: geminiKey.trim() }))
     } catch (e) { setGeminiMsg(`Fehler: ${e.message}`) }
     finally { setGeminiSaving(false) }
   }
@@ -273,7 +345,7 @@ export default function Settings() {
     setAvSaving(true); setAvMsg('')
     try {
       await saveAlphaVantageKey(avKey.trim())
-      setAvMsg('Gespeichert.'); setAvStatus(true)
+      setAvMsg('Gespeichert.'); setAvStatus(true); setKeyPreviews(current => ({ ...current, alphavantage: avKey.trim() }))
     } catch (e) { setAvMsg(`Fehler: ${e.message}`) }
     finally { setAvSaving(false) }
   }
@@ -283,7 +355,7 @@ export default function Settings() {
     setTavSaving(true); setTavMsg('')
     try {
       await saveApiKey('tavily', tavilyKey.trim())
-      setTavMsg('Gespeichert.'); setTavStatus(true)
+      setTavMsg('Gespeichert.'); setTavStatus(true); setKeyPreviews(current => ({ ...current, tavily: tavilyKey.trim() }))
     } catch (e) { setTavMsg(`Fehler: ${e.message}`) }
     finally { setTavSaving(false) }
   }
@@ -368,6 +440,7 @@ export default function Settings() {
         <div>
           <label className="label">Claude API-Key</label>
           <SecretInput value={claudeKey} onChange={setClaudeKey} placeholder="sk-ant-api03-..." disabled={claudeSaving} />
+          <SavedKeyPreview value={keyPreviews.claude} configured={claudeStatus} />
           {claudeStatus && !claudeKey && (
             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
               ✓ Key hinterlegt — neuen eingeben zum Überschreiben
@@ -404,6 +477,7 @@ export default function Settings() {
         <div>
           <label className="label">OpenAI API-Key</label>
           <SecretInput value={openaiKey} onChange={setOpenaiKey} placeholder="sk-proj-..." disabled={openaiSaving} />
+          <SavedKeyPreview value={keyPreviews.openai} configured={openaiStatus} />
           {openaiStatus && !openaiKey && (
             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
               ✓ Key hinterlegt — neuen eingeben zum Überschreiben
@@ -440,6 +514,7 @@ export default function Settings() {
         <div>
           <label className="label">Gemini API-Key</label>
           <SecretInput value={geminiKey} onChange={setGeminiKey} placeholder="AIzaSy..." disabled={geminiSaving} />
+          <SavedKeyPreview value={keyPreviews.gemini} configured={geminiStatus} />
           {geminiStatus && !geminiKey && (
             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
               ✓ Key hinterlegt — neuen eingeben zum Überschreiben
@@ -472,6 +547,7 @@ export default function Settings() {
         <div>
           <label className="label">Tavily API-Key</label>
           <SecretInput value={tavilyKey} onChange={setTavilyKey} placeholder="tvly-..." disabled={tavSaving} />
+          <SavedKeyPreview value={keyPreviews.tavily} configured={tavStatus} />
         </div>
         {tavMsg && <p className="text-xs" style={{ color: tavStatus ? 'var(--success)' : 'var(--danger)' }}>{tavMsg}</p>}
         <div className="flex gap-2">
@@ -497,6 +573,7 @@ export default function Settings() {
         <div>
           <label className="label">Alpha Vantage API-Key</label>
           <SecretInput value={avKey} onChange={setAvKey} placeholder="XXXXXXXXXXXXXX" disabled={avSaving} />
+          <SavedKeyPreview value={keyPreviews.alphavantage} configured={avStatus} />
         </div>
         {avMsg && <p className="text-xs" style={{ color: avStatus ? 'var(--success)' : 'var(--danger)' }}>{avMsg}</p>}
         <div className="flex gap-2">

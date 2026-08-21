@@ -18,6 +18,7 @@
 
 ## ✅ Gelöst
 
+- **Settings Key-Vorschau** (2026-08-21): `Settings.jsx` zeigt konfigurierte Keys als maskierte Vorschau mit Reveal- und Copy-Button. Die UI nutzt optionale Preview-Felder aus `/api/keys/status`; weil die bestehende Route nur Flags liefert, bleibt ein Key nach Reload aus Sicherheitsgründen nicht aufdeck- oder kopierbar, bis er erneut eingegeben wurde.
 - **Ticker-Verwechslung (ORC.DE → Orchid Island statt Oracle)** (2026-04-05 S3): Root Cause: `gather_ticker_qualitative` nutzte nur den Ticker-Kürzel in Queries; LLM recherchierte die falsche Firma. Fix: `gather_ticker_qualitative(company_name=)` nutzt jetzt den yFinance-Firmennamen. `user_message` enthält "⚠️ UNTERNEHMEN: {company_name}" als prominente Pflicht-Information. ALTAIR_SYSTEM_PROMPT verbietet Ticker-only-Recherchen.
 - **Tavily Token-Optimierung** (2026-04-05 S3): `gather_ticker_qualitative` reduziert von 2 Suchen×4 Ergebnisse (advanced) auf 1 Suche×3 Ergebnisse (basic) → ~75% weniger Tavily-Credits. `search_fn` in Agentic Loop: max_results=2→1, search_depth=advanced→basic, content[:300]→[:200]. Gesamt: von ~12 Quellen auf ~6 Quellen pro Analyse.
 - **Fair Value Mrd. EUR statt EUR/Aktie** (2026-04-05 S3): Prompt erzwingt jetzt "Fair Value IMMER als Preis pro Aktie (€/Aktie)" mit expliziter Berechnungsformel. Spaltenheader Rendite-Tabelle auf "Fair Value (€/Aktie)" geändert.
