@@ -5,6 +5,8 @@ No API key needed, no token cost, returns clean numbers.
 """
 
 import asyncio
+import math
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 import yfinance as yf
@@ -13,6 +15,8 @@ import yfinance as yf
 class YFinanceService:
     def __init__(self):
         self._executor = ThreadPoolExecutor(max_workers=6)
+        self._cache = {}
+        self._cache_ttl_seconds = 60
 
     # Common exchange suffixes to try when bare ticker returns no data
     _SUFFIXES = [".AX", ".TO", ".L", ".DE", ".F", ".PA", ".AS", ".SW", ".HK", ".T"]
@@ -20,11 +24,9 @@ class YFinanceService:
     def _fetch_sync(self, ticker: str) -> dict:
         """Synchronous yfinance fetch — tries exchange suffixes if bare ticker fails."""
         def _valid(info: dict) -> bool:
-            return bool(
-                info.get("regularMarketPrice")
-                or info.get("currentPrice")
-                or info.get("previousClose")
-            )
+            return any(self._finite_number(info.get(field)) for field in (
+                "regularMarketPrice", "currentPrice", "previousClose"
+            ))
 
         # 1. Try as-is
         try:
@@ -52,7 +54,9 @@ class YFinanceService:
     def _build_result(self, ticker: str, info: dict) -> dict:
         """Extract relevant fields from yfinance info dict."""
         try:
-
+            current_price = self._first_finite(
+                info.get("currentPrice"), info.get("regularMarketPrice"), info.get("previousClose")
+            )
             return {
                 "ticker": ticker,
                 "name": info.get("longName") or info.get("shortName", ticker),
@@ -61,10 +65,10 @@ class YFinanceService:
                 "country": info.get("country", ""),
                 "currency": info.get("currency", "USD"),
                 # Price
-                "current_price": info.get("currentPrice") or info.get("regularMarketPrice") or info.get("previousClose"),
-                "previous_close": info.get("previousClose"),
-                "week52_high": info.get("fiftyTwoWeekHigh"),
-                "week52_low": info.get("fiftyTwoWeekLow"),
+                "current_price": current_price,
+                "previous_close": self._finite_or_none(info.get("previousClose")),
+                "week52_high": self._finite_or_none(info.get("fiftyTwoWeekHigh")),
+                "week52_low": self._finite_or_none(info.get("fiftyTwoWeekLow")),
                 # Valuation
                 "market_cap": info.get("marketCap"),
                 "enterprise_value": info.get("enterpriseValue"),
@@ -111,9 +115,33 @@ class YFinanceService:
         except Exception as e:
             return {"ticker": ticker, "error": str(e)}
 
+    @staticmethod
+    def _finite_number(value) -> bool:
+        try:
+            return value is not None and math.isfinite(float(value))
+        except (TypeError, ValueError):
+            return False
+
+    @classmethod
+    def _finite_or_none(cls, value):
+        return float(value) if cls._finite_number(value) else None
+
+    @classmethod
+    def _first_finite(cls, *values):
+        for value in values:
+            if cls._finite_number(value):
+                return float(value)
+        return None
+
     async def get_ticker_data(self, ticker: str) -> dict:
+        ticker = str(ticker).upper().strip()
+        cached = self._cache.get(ticker)
+        if cached and cached[0] > time.monotonic():
+            return dict(cached[1])
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(self._executor, self._fetch_sync, ticker)
+        result = await loop.run_in_executor(self._executor, self._fetch_sync, ticker)
+        self._cache[ticker] = (time.monotonic() + self._cache_ttl_seconds, result)
+        return dict(result)
 
     async def get_multiple(self, tickers: list[str]) -> list[dict]:
         """Fetch multiple tickers in parallel."""

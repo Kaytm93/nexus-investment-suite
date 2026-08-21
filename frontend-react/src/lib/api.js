@@ -67,6 +67,14 @@ export async function fetchMarketMovers() {
   return apiFetch(`/api/market/movers`)
 }
 
+export function openMarketStream(onMarket) {
+  const stream = new EventSource(`${API_BASE}/api/market/stream`)
+  stream.addEventListener('market', event => {
+    try { onMarket(JSON.parse(event.data)) } catch {}
+  })
+  return stream
+}
+
 // ── Elara Screener ──────────────────────────────────────────────────────────
 
 export async function runElaraScreener(params) {

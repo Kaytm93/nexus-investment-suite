@@ -4,6 +4,19 @@
 
 ---
 
+## Gemeinsamer SSE-Marktstream mit 60s-TTL-Cache
+**Datum:** 2026-08-21 (Task 7)
+**Status:** aktiv
+
+**Warum:** Ein zentraler Backend-Poller verhindert, dass Home- und Portfolio-Clients yFinance unabhängig voneinander und zu häufig abfragen. Der 60s-TTL-Cache reduziert Ratelimits; SSE verteilt denselben Snapshot effizient an alle offenen Clients.
+
+**Konsequenz:**
+- `/api/market/stream` ist ein öffentlicher SSE-Stream für Markt-Snapshots.
+- Portfolio-Clients stoßen beim Snapshot einen bestehenden, ebenfalls gecachten Preis-Refresh an.
+- Ungültige yFinance-NaN-/Infinity-Werte werden verworfen statt als Kurs gespeichert.
+
+---
+
 ## Elara-Screener-Export als semikolon-separierte CSV
 **Datum:** 2026-08-21 (Task 4)
 **Status:** aktiv

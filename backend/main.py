@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import json
+import math
 import uuid
 import time
 import asyncio
@@ -16,6 +17,7 @@ from contextlib import asynccontextmanager
 from typing import Optional, Dict, List
 
 from dotenv import load_dotenv
+import httpx
 load_dotenv()
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Header, Depends, Request
@@ -160,6 +162,13 @@ def cache_get(key: str):
 
 def cache_set(key: str, value, ttl_seconds: int) -> None:
     _TTL_CACHE[key] = (time.monotonic() + ttl_seconds, value)
+
+
+def _finite_number(value) -> bool:
+    try:
+        return value is not None and math.isfinite(float(value))
+    except (TypeError, ValueError):
+        return False
 
 # ── System Prompts ─────────────────────────────────────────────────────────────
 
@@ -358,10 +367,38 @@ manager = ConnectionManager()
 search_service: Optional[SearchService] = None
 ollama_service: Optional[OllamaService] = None
 yf_service: Optional[YFinanceService] = None
+_market_poll_task: Optional[asyncio.Task] = None
+_market_snapshot: Optional[dict] = None
+_market_subscribers = set()
+
+def format_sse_event(event_name: str, payload: dict) -> str:
+    """Serialize one named SSE event, keeping the wire format testable."""
+    return f"event: {event_name}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+async def _poll_market_stream() -> None:
+    """Refresh shared market data and notify all SSE subscribers every 60s."""
+    global _market_snapshot
+    while True:
+        try:
+            snapshot = await get_market_movers()
+            _market_snapshot = {
+                **snapshot,
+                "fetched_at": datetime.now(timezone.utc).isoformat(),
+            }
+            for subscriber in list(_market_subscribers):
+                if subscriber.full():
+                    try:
+                        subscriber.get_nowait()
+                    except asyncio.QueueEmpty:
+                        pass
+                await subscriber.put(_market_snapshot)
+        except Exception as exc:
+            print(f"[NEXUS] Live market poll failed: {exc}")
+        await asyncio.sleep(60)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global search_service, ollama_service, yf_service
+    global search_service, ollama_service, yf_service, _market_poll_task
     init_db()
     print("[NEXUS] Database initialized.")
 
@@ -397,6 +434,7 @@ async def lifespan(app: FastAPI):
     app.state.ollama_service = ollama_service
     app.state.yf_service = yf_service
     app.state.connection_manager = manager
+    _market_poll_task = asyncio.create_task(_poll_market_stream())
 
     yield
 
@@ -405,6 +443,9 @@ async def lifespan(app: FastAPI):
     await ollama_service.close()
     if yf_service:
         yf_service.close()
+    if _market_poll_task:
+        _market_poll_task.cancel()
+        await asyncio.gather(_market_poll_task, return_exceptions=True)
     print("[NEXUS] Services closed.")
 
 
@@ -1059,7 +1100,8 @@ async def refresh_prices(user_id: Optional[str] = Depends(get_current_user)):
     for pos in positions:
         data = price_map.get(pos["ticker"], {})
         price = data.get("current_price")
-        if price:
+        if _finite_number(price) and float(price) > 0:
+            price = float(price)
             if portfolio_id:
                 supabase_db.update_position_price(pos["id"], price)
             else:
@@ -1513,7 +1555,7 @@ async def get_market_movers():
                     if not t:
                         continue
                     prev, curr = _get_price_change(t)
-                    if not curr or not prev or prev == 0:
+                    if not _finite_number(curr) or not _finite_number(prev) or prev == 0:
                         continue
                     change = (curr / prev - 1) * 100
                     # shortName via fast_info if available, else sym
@@ -1536,7 +1578,7 @@ async def get_market_movers():
                 try:
                     t = yf.Ticker(sym)
                     prev, curr = _get_price_change(t)
-                    if not curr or not prev or prev == 0:
+                    if not _finite_number(curr) or not _finite_number(prev) or prev == 0:
                         continue
                     change = (curr / prev - 1) * 100
                     movers.append({
@@ -1572,7 +1614,7 @@ async def get_market_movers():
                 try:
                     hist = t.history(period="5d", interval="1h")
                     if not hist.empty:
-                        spark = [round(float(v), 2) for v in hist["Close"].dropna().tolist()]
+                        spark = [round(float(v), 2) for v in hist["Close"].dropna().tolist() if _finite_number(v)]
                 except Exception:
                     pass
 
@@ -1591,8 +1633,36 @@ async def get_market_movers():
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=4) as ex:
         data = await loop.run_in_executor(ex, _fetch)
-    cache_set("market:movers", data, ttl_seconds=300)  # 5 min
+    cache_set("market:movers", data, ttl_seconds=60)
     return data
+
+def _market_stream_response(request: Request):
+    subscriber = asyncio.Queue(maxsize=2)
+    _market_subscribers.add(subscriber)
+
+    async def event_generator():
+        try:
+            if _market_snapshot:
+                yield format_sse_event("market", _market_snapshot)
+            while not await request.is_disconnected():
+                try:
+                    snapshot = await asyncio.wait_for(subscriber.get(), timeout=25)
+                    yield format_sse_event("market", snapshot)
+                except asyncio.TimeoutError:
+                    yield ": keep-alive\n\n"
+        finally:
+            _market_subscribers.discard(subscriber)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+@app.get("/api/market/stream")
+async def market_stream(request: Request):
+    """Stream shared market snapshots to Home and Portfolio clients."""
+    return _market_stream_response(request)
 
 # ── API Key management ────────────────────────────────────────────────────────────
 

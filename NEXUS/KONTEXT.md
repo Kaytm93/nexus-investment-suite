@@ -1,6 +1,6 @@
 # NEXUS Investment Suite — Vollständiger Projektkontext
 
-> Letzte Aktualisierung: 2026-08-21 | Stand: Portfolio Transaktions-History + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
+> Letzte Aktualisierung: 2026-08-21 | Stand: Echte Live-Kurse + Portfolio Transaktions-History + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
 
 ---
 
@@ -139,6 +139,7 @@ Alle Endpunkte in `backend/main.py`. Basis-URL: `http://localhost:7842` (oder Re
 | `GET` | `/api/search` | Ticker-Suche (`?q=AAPL`) |
 | `GET` | `/api/market/benchmarks` | S&P 500, MSCI World, DAX, etc. |
 | `GET` | `/api/market/movers` | Top Gainers + Losers |
+| `GET` | `/api/market/stream` | SSE-Live-Stream für Markt-Snapshots (60s) |
 | `GET` | `/api/keys/status` | Welche Keys sind gesetzt? |
 | `POST` | `/api/keys/test` | Key testen |
 | `POST` | `/api/keys/{provider}` | Key speichern (`claude`, `tavily`, `alphavantage`, `ollama`) |
@@ -248,7 +249,7 @@ WebSocket nur für Progress-Anzeige.
 9. ~~Screener CSV-Export~~ ✅ erledigt 2026-08-21 (BOM, Semikolon-Separator, Excel-kompatibler Download)
 10. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` ISO-8601, Alters-Badge, Force-Refresh-Button)
 11. ~~Portfolio Transaktions-History~~ ✅ erledigt 2026-08-21 (SQLite/Supabase-Tabelle, CRUD-Endpunkte, History-Tab im Positions-Modal)
-12. Echte Live-Kurse: Backend-Polling yFinance alle 60s (Cache mit TTL), SSE-Endpoint `/api/market/stream`; Home Indices + Portfolio aktualisieren sich live.
+12. ~~Echte Live-Kurse~~ ✅ erledigt 2026-08-21 (60s-yFinance-TTL-Cache, SSE `/api/market/stream`, Home + Portfolio live)
 
 ➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 

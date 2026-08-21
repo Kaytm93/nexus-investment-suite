@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-08-21 — Echte Live-Kurse
+
+- `backend/yfinance_service.py` — 60s-TTL-Cache für Ticker-Abfragen, Ticker-Normalisierung und NaN-/Infinity-Guards ergänzt.
+- `backend/main.py` — gemeinsamer 60s-Markt-Poller, SSE-Endpoint `/api/market/stream` und zusätzliche Guards für Movers, Sparklines und Portfolio-Refresh ergänzt.
+- `frontend-react/src/lib/api.js` — `openMarketStream()` für benannte SSE-Market-Events ergänzt.
+- `frontend-react/src/pages/Home.jsx` / `pages/Portfolio.jsx` — Markt- bzw. Portfolio-Daten reagieren auf Live-Snapshots.
+- `backend/test_live_market.py` — Tests für NaN-Schutz und SSE-Serialisierung ergänzt.
+
+**Build:** ✅ `npm run build`
+**Backend-Tests:** ✅ Live-Market- und Transaction-History-Tests
+
+---
+
 ## 2026-08-21 — Portfolio Transaktions-History
 
 - `backend/database.py` — `position_transactions` mit Foreign Key, Initial-Kauf-Migration und SQLite-CRUD ergänzt.

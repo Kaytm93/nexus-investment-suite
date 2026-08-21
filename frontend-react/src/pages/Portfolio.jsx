@@ -4,6 +4,7 @@ import {
   getPortfolioPositions, addPosition, updatePosition, deletePosition,
   refreshPrices, getPortfolioPerformance, searchTicker,
   getPositionTransactions, addPositionTransaction, deletePositionTransaction,
+  openMarketStream,
   formatCurrency, formatPercent, formatLargeNumber
 } from '../lib/api'
 import PerformanceChart from '../components/PerformanceChart'
@@ -378,6 +379,17 @@ export default function Portfolio() {
   }, [])
 
   useEffect(() => { loadData() }, [loadData])
+
+  useEffect(() => {
+    const stream = openMarketStream(() => {
+      refreshPrices()
+        .then(data => {
+          if (Array.isArray(data?.positions)) setPositions(data.positions)
+        })
+        .catch(() => {})
+    })
+    return () => stream.close()
+  }, [])
 
   const handleRefresh = async () => {
     setRefreshing(true)

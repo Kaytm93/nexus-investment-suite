@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { fetchMarketMovers } from '../lib/api'
+import { fetchMarketMovers, openMarketStream } from '../lib/api'
 import StockChart from '../components/StockChart'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -493,6 +493,18 @@ export default function Home() {
   }
 
   useEffect(() => { loadData() }, [])
+
+  useEffect(() => {
+    const stream = openMarketStream(data => {
+      if (Array.isArray(data?.indices)) setIndices(data.indices)
+      if (Array.isArray(data?.gainers)) setGainers(data.gainers)
+      if (Array.isArray(data?.losers)) setLosers(data.losers)
+      if (data?.fetched_at) setFetchedAt(new Date(data.fetched_at))
+      setBackendOffline(false)
+    })
+    stream.onerror = () => setBackendOffline(true)
+    return () => stream.close()
+  }, [])
 
   return (
     <div style={{ background: 'var(--bg)' }}>

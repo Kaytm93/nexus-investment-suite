@@ -1,6 +1,6 @@
 # NEXUS — Bug-Tracker & Problemliste
 
-> Letzte Aktualisierung: 2026-08-21 (Task 6)
+> Letzte Aktualisierung: 2026-08-21 (Task 7)
 
 ---
 
@@ -19,6 +19,8 @@ Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festge
 ---
 
 ## ✅ Gelöst
+
+- **Echte Live-Kurse** (2026-08-21 Task 7): Gemeinsamer yFinance-Markt-Poller mit 60s-TTL-Cache und SSE-Endpoint `/api/market/stream`; Home-Indizes und Portfolio-Kurse reagieren auf Live-Snapshots. NaN-/Infinity-Guards verhindern ungültige Preise in Kurs- und Sparkline-Daten.
 
 - **Portfolio Transaktions-History** (2026-08-21 Task 6): Kaufhistorie über `position_transactions` ergänzt, inklusive initialem Kauf, SQLite-Fallback, Supabase-Unterstützung und History-Tab im Positions-Modal.
 - **Altair Cache-Indikator** (2026-08-21 Task 5): Der Altair-Response liefert `cached_at` als UTC-ISO-8601-Zeitstempel für Cache-Hits und frische Reports. Die Analysis-Seite zeigt das Report-Alter und stößt über „Neu analysieren" einen Request mit `force_refresh=true` an.

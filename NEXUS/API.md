@@ -267,6 +267,19 @@ Index-Benchmarks für Performance-Vergleich.
 
 ---
 
+### `GET /api/market/stream`
+Server-Sent Events für Live-Markt-Snapshots. Der Backend-Poller aktualisiert den gemeinsamen yFinance-Cache alle 60 Sekunden.
+
+**Event:** `market`
+```text
+event: market
+data: {"indices": [...], "gainers": [...], "losers": [...], "fetched_at": "2026-08-21T...Z"}
+```
+
+Bei ausbleibenden Updates sendet der Stream Keep-Alive-Kommentare. Der Frontend-Client verbindet sich ohne `localStorage/sessionStorage` über `EventSource`.
+
+---
+
 ## Portfolio
 
 > Alle Portfolio-Endpunkte erfordern `Authorization: Bearer <token>`
