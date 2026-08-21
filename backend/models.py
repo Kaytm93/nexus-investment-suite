@@ -136,6 +136,23 @@ class PortfolioPositionCreate(BaseModel):
     )
 
 
+class PortfolioTransactionCreate(BaseModel):
+    """Request body for adding a purchase to a position's history."""
+    entry_price: float = Field(..., gt=0)
+    shares: float = Field(..., gt=0)
+    purchase_date: str = Field(..., pattern=ISO_DATE_PATTERN)
+
+
+class PortfolioTransaction(BaseModel):
+    """A single historical purchase transaction."""
+    id: str
+    position_id: str
+    entry_price: float
+    shares: float
+    purchase_date: str
+    created_at: Optional[str] = None
+
+
 class PortfolioPosition(BaseModel):
     """A full portfolio position including calculated fields."""
     id: str  # UUID string from Supabase (or str-cast int from SQLite fallback)

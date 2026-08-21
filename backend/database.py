@@ -71,6 +71,25 @@ def init_db() -> None:
 
             CREATE INDEX IF NOT EXISTS idx_elara_sector
                 ON elara_results (sector_query, created_at DESC);
+
+            CREATE TABLE IF NOT EXISTS position_transactions (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                position_id   INTEGER NOT NULL REFERENCES positions(id) ON DELETE CASCADE,
+                entry_price  REAL    NOT NULL,
+                shares       REAL    NOT NULL,
+                purchase_date TEXT   NOT NULL,
+                created_at   TEXT    NOT NULL DEFAULT (datetime('now'))
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_position_transactions_position
+                ON position_transactions (position_id, purchase_date DESC, id DESC);
+
+            INSERT INTO position_transactions (position_id, entry_price, shares, purchase_date)
+            SELECT p.id, p.entry_price, p.shares, p.purchase_date
+            FROM positions p
+            WHERE NOT EXISTS (
+                SELECT 1 FROM position_transactions t WHERE t.position_id = p.id
+            );
         """)
         conn.commit()
     finally:
@@ -128,7 +147,17 @@ def add_position(
         row = conn.execute(
             "SELECT * FROM positions WHERE id = ?", (cursor.lastrowid,)
         ).fetchone()
-        return dict(row)
+        result = dict(row)
+        conn.execute(
+            """
+            INSERT INTO position_transactions
+                (position_id, entry_price, shares, purchase_date)
+            VALUES (?, ?, ?, ?)
+            """,
+            (cursor.lastrowid, entry_price, shares, purchase_date),
+        )
+        conn.commit()
+        return result
     finally:
         conn.close()
 
@@ -185,6 +214,83 @@ def update_position_price(position_id: int, current_price: float) -> bool:
         cursor = conn.execute(
             "UPDATE positions SET current_price = ? WHERE id = ?",
             (current_price, position_id),
+        )
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def get_position_transactions(position_id: int) -> List[Dict[str, Any]]:
+    """Return purchase transactions for a position, newest purchase first."""
+    conn = _get_connection()
+    try:
+        rows = conn.execute(
+            """
+            SELECT id, position_id, entry_price, shares, purchase_date, created_at
+            FROM position_transactions
+            WHERE position_id = ?
+            ORDER BY purchase_date DESC, id DESC
+            """,
+            (position_id,),
+        ).fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+
+def add_position_transaction(
+    position_id: int,
+    entry_price: float,
+    shares: float,
+    purchase_date: str,
+) -> Dict[str, Any]:
+    """Add a purchase transaction to an existing position."""
+    conn = _get_connection()
+    try:
+        cursor = conn.execute(
+            """
+            INSERT INTO position_transactions
+                (position_id, entry_price, shares, purchase_date)
+            VALUES (?, ?, ?, ?)
+            """,
+            (position_id, entry_price, shares, purchase_date),
+        )
+        conn.commit()
+        row = conn.execute(
+            """
+            SELECT id, position_id, entry_price, shares, purchase_date, created_at
+            FROM position_transactions WHERE id = ?
+            """,
+            (cursor.lastrowid,),
+        ).fetchone()
+        return dict(row)
+    finally:
+        conn.close()
+
+
+def get_position_transaction(transaction_id: int) -> Optional[Dict[str, Any]]:
+    """Return one purchase transaction or None."""
+    conn = _get_connection()
+    try:
+        row = conn.execute(
+            """
+            SELECT id, position_id, entry_price, shares, purchase_date, created_at
+            FROM position_transactions WHERE id = ?
+            """,
+            (transaction_id,),
+        ).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def delete_position_transaction(transaction_id: int) -> bool:
+    """Delete a purchase transaction by ID."""
+    conn = _get_connection()
+    try:
+        cursor = conn.execute(
+            "DELETE FROM position_transactions WHERE id = ?", (transaction_id,)
         )
         conn.commit()
         return cursor.rowcount > 0

@@ -1,17 +1,17 @@
 # NEXUS — Dashboard
 
-> Zuletzt aktualisiert: 2026-08-21 · Task 5 Altair Cache-Indikator abgeschlossen
+> Zuletzt aktualisiert: 2026-08-21 · Task 6 Portfolio Transaktions-History abgeschlossen
 
 ---
 
 ## 🚦 Projektstatus
 
-**Vault-Sync 2026-08-21: Task 5 Altair Cache-Indikator umgesetzt. Altair liefert `cached_at` als ISO-8601-Zeitstempel; die Analyse zeigt Cache-Alter und bietet einen echten `force_refresh`-Button. Build ✅.**
+**Vault-Sync 2026-08-21: Task 6 Portfolio Transaktions-History umgesetzt. Kaufhistorie ist über SQLite-Fallback und Supabase persistierbar; das Positions-Modal enthält einen History-Tab. Build ✅.**
 
 ### Was gerade läuft
 
-- Tasks 1–5 sind abgeschlossen; Build und Code-Verifikation sind erfolgt.
-- Nächster Queue-Task: **Portfolio Transaktions-History**.
+- Tasks 1–6 sind abgeschlossen; Build und Code-Verifikation sind erfolgt.
+- Nächster Queue-Task: **Echte Live-Kurse**.
 
 ---
 
@@ -74,7 +74,7 @@
 3. [x] **Analysis Regex robuster** — `extractReportSections` + Feld-Extraktion (Conviction/Timing/Preis/DCF-Zeilen) toleranter gemacht: flexible Labels (dt./engl.), Tausenderpunkte, €/$-Zeichen, fehlende Felder → saubere Fallbacks statt Crash. Keine Output-Inhalte geändert. Abgeschlossen 2026-08-21.
 4. [x] **Screener CSV-Export** — Elara-Ergebnisse als CSV-Download (Button neben Ergebnis-Tabelle, BOM für Excel, Semikolon-Separator für DE-Excel). Abgeschlossen 2026-08-21.
 5. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` als ISO-8601 im Response, Badge mit Cache-Alter, Force-Refresh-Button)
-6. [ ] **Portfolio Transaktions-History** — Kaufhistorie je Position (Backend: Tabelle/Feld + Endpunkte, Supabase + SQLite-Fallback; Frontend: History-Tab im Positions-Modal).
+6. [x] **Portfolio Transaktions-History** — Kaufhistorie je Position (Backend: Tabelle/Feld + Endpunkte, Supabase + SQLite-Fallback; Frontend: History-Tab im Positions-Modal). Abgeschlossen 2026-08-21.
 7. [ ] **Echte Live-Kurse** — Backend-Polling yFinance alle 60s (Cache mit TTL), SSE-Endpoint `/api/market/stream`; Home Indices + Portfolio aktualisieren sich live. yFinance-NaN-Guards beachten ([[PROBLEME]]).
 8. [ ] **Watchlist** — Stars auf Stock-Cards (Home/Screener/Analysis), persistiert in Supabase (Fallback SQLite), Watchlist-Sektion auf Home.
 

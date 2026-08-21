@@ -1,6 +1,6 @@
 # NEXUS Investment Suite — Vollständiger Projektkontext
 
-> Letzte Aktualisierung: 2026-08-21 | Stand: Home Hover → CSS + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
+> Letzte Aktualisierung: 2026-08-21 | Stand: Portfolio Transaktions-History + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
 
 ---
 
@@ -90,7 +90,7 @@ Ziel: Research-Qualität wie professionelle Analysten — kostenlos, BYOK (Bring
 | `/auth` | `pages/Auth.jsx` | ✅ | Supabase Login + Register (Tab-Switch), PW-Reset mit `redirectTo`, Recovery-Hash-Handling |
 | `/screener` | `pages/Screener.jsx` | ✅ | Elara: 14 Sektoren, Marktcap-Filter, Region, Horizont, GSAP Row-Stagger |
 | `/analyse` | `pages/Analysis.jsx` | ✅ | Altair: TickerSearch, WebSocket-Progress, Conviction Gauge, DCF Chart, Markdown-Sektionen |
-| `/portfolio` | `pages/Portfolio.jsx` | ✅ | CRUD Positionen, Modal, Sortierung, Performance vs. Benchmark |
+| `/portfolio` | `pages/Portfolio.jsx` | ✅ | CRUD Positionen, Modal, Kaufhistorie, Sortierung, Performance vs. Benchmark |
 | `/settings` | `pages/Settings.jsx` | ✅ | Groq / Claude / Tavily / AlphaVantage Keys, Test-Buttons, Health-Check |
 | `/chat` | `pages/Chat.jsx` | ✅ | KI-Assistent: Streaming SSE via Groq, localStorage-Verlauf, Suggested Prompts, Split-Layout |
 | `*` | `App.jsx` | ✅ | Catch-all → redirect `/` |
@@ -129,6 +129,9 @@ Alle Endpunkte in `backend/main.py`. Basis-URL: `http://localhost:7842` (oder Re
 | `POST` | `/api/portfolio/positions` | Position hinzufügen |
 | `PUT` | `/api/portfolio/positions/{id}` | Position updaten |
 | `DELETE` | `/api/portfolio/positions/{id}` | Position löschen |
+| `GET` | `/api/portfolio/positions/{id}/transactions` | Kaufhistorie laden (Auth required) |
+| `POST` | `/api/portfolio/positions/{id}/transactions` | Kauf zur Historie hinzufügen |
+| `DELETE` | `/api/portfolio/positions/{id}/transactions/{transaction_id}` | Historischen Kauf löschen |
 | `POST` | `/api/portfolio/refresh` | Preise via yFinance aktualisieren |
 | `GET` | `/api/portfolio/performance` | Performance vs. Benchmarks |
 | `GET` | `/api/stock/{ticker}` | Aktueller Kurs + Stammdaten |
@@ -243,7 +246,9 @@ WebSocket nur für Progress-Anzeige.
 7. ~~Home.jsx Inline-Hover-Handler (onMouseEnter/Leave) → CSS-Klassen~~ ✅ erledigt 2026-08-21
 8. ~~Analysis.jsx Regex-Parsing robuster machen~~ ✅ erledigt 2026-08-21 (flexible Labels, lokalisierte Währungen/Zahlen, sichere Fallbacks)
 9. ~~Screener CSV-Export~~ ✅ erledigt 2026-08-21 (BOM, Semikolon-Separator, Excel-kompatibler Download)
-10. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` ISO-8601, Alters-Badge, „Neu analysieren" mit `force_refresh`)
+10. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` ISO-8601, Alters-Badge, Force-Refresh-Button)
+11. ~~Portfolio Transaktions-History~~ ✅ erledigt 2026-08-21 (SQLite/Supabase-Tabelle, CRUD-Endpunkte, History-Tab im Positions-Modal)
+12. Echte Live-Kurse: Backend-Polling yFinance alle 60s (Cache mit TTL), SSE-Endpoint `/api/market/stream`; Home Indices + Portfolio aktualisieren sich live.
 
 ➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 

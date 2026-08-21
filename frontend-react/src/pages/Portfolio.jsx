@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   getPortfolioPositions, addPosition, updatePosition, deletePosition,
   refreshPrices, getPortfolioPerformance, searchTicker,
+  getPositionTransactions, addPositionTransaction, deletePositionTransaction,
   formatCurrency, formatPercent, formatLargeNumber
 } from '../lib/api'
 import PerformanceChart from '../components/PerformanceChart'
@@ -28,7 +29,54 @@ function PositionModal({ position, onSave, onClose }) {
   const [error, setError] = useState('')
   const [tickerResults, setTickerResults] = useState([])
   const [tickerOpen, setTickerOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('details')
+  const [transactions, setTransactions] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyError, setHistoryError] = useState('')
+  const [transactionForm, setTransactionForm] = useState({
+    entry_price: '',
+    shares: '',
+    purchase_date: new Date().toISOString().split('T')[0],
+  })
 
+  useEffect(() => {
+    if (activeTab !== 'history' || !isEdit) return
+    setHistoryLoading(true)
+    setHistoryError('')
+    getPositionTransactions(position.id)
+      .then(data => setTransactions(Array.isArray(data) ? data : []))
+      .catch(err => setHistoryError(err.message || 'Historie konnte nicht geladen werden.'))
+      .finally(() => setHistoryLoading(false))
+  }, [activeTab, isEdit, position?.id])
+
+  const handleTransactionSubmit = async (e) => {
+    e.preventDefault()
+    setHistoryError('')
+    try {
+      await addPositionTransaction(position.id, {
+        entry_price: parseFloat(transactionForm.entry_price),
+        shares: parseFloat(transactionForm.shares),
+        purchase_date: transactionForm.purchase_date,
+      })
+      setTransactionForm({ entry_price: '', shares: '', purchase_date: new Date().toISOString().split('T')[0] })
+      setTransactions(await getPositionTransactions(position.id))
+    } catch (err) {
+      setHistoryError(err.message || 'Transaktion konnte nicht gespeichert werden.')
+    }
+  }
+
+  const handleTransactionDelete = async (transactionId) => {
+    try {
+      await deletePositionTransaction(position.id, transactionId)
+      setTransactions(items => items.filter(item => item.id !== transactionId))
+    } catch (err) {
+      setHistoryError(err.message || 'Transaktion konnte nicht gelöscht werden.')
+    }
+  }
+
+  const handleTransactionChange = (field, value) => {
+    setTransactionForm(form => ({ ...form, [field]: value }))
+  }
   const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }))
 
   const handleTickerSearch = async (q) => {
@@ -93,6 +141,53 @@ function PositionModal({ position, onSave, onClose }) {
           </button>
         </div>
 
+        <div className="flex gap-1 px-5 pt-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('details')}
+            className="px-3 py-2 text-xs font-medium transition-colors"
+            style={{ color: activeTab === 'details' ? 'var(--accent)' : 'var(--text-muted)', borderBottom: activeTab === 'details' ? '2px solid var(--accent)' : '2px solid transparent' }}
+          >Details</button>
+          {isEdit && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('history')}
+              className="px-3 py-2 text-xs font-medium transition-colors"
+              style={{ color: activeTab === 'history' ? 'var(--accent)' : 'var(--text-muted)', borderBottom: activeTab === 'history' ? '2px solid var(--accent)' : '2px solid transparent' }}
+            >Kaufhistorie</button>
+          )}
+        </div>
+
+        {activeTab === 'history' ? (
+          <div className="p-5 space-y-4">
+            {historyError && <div className="alert-error"><AlertCircle size={14} /><p className="text-xs">{historyError}</p></div>}
+            {historyLoading ? (
+              <div className="flex items-center gap-2 py-6 justify-center" style={{ color: 'var(--text-muted)' }}><Loader2 size={16} className="animate-spin" />Historie wird geladen…</div>
+            ) : (
+              <div className="space-y-2">
+                {transactions.length === 0 && <p className="text-sm py-3" style={{ color: 'var(--text-muted)' }}>Noch keine Käufe erfasst.</p>}
+                {transactions.map(transaction => (
+                  <div key={transaction.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                    <div>
+                      <p className="text-sm font-mono" style={{ color: 'var(--text)' }}>{formatCurrency(transaction.entry_price)} × {transaction.shares}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{transaction.purchase_date}</p>
+                    </div>
+                    <button type="button" onClick={() => handleTransactionDelete(transaction.id)} className="p-1.5 rounded-md transition-colors" style={{ color: 'var(--text-muted)' }} title="Transaktion löschen"><Trash2 size={13} /></button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <form onSubmit={handleTransactionSubmit} className="space-y-3 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
+              <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>Kauf hinzufügen</p>
+              <div className="grid grid-cols-2 gap-3">
+                <input type="number" step="0.01" min="0.01" required value={transactionForm.entry_price} onChange={e => handleTransactionChange('entry_price', e.target.value)} className="input-field font-mono" placeholder="Preis" aria-label="Kaufpreis" />
+                <input type="number" step="0.001" min="0.001" required value={transactionForm.shares} onChange={e => handleTransactionChange('shares', e.target.value)} className="input-field font-mono" placeholder="Stück" aria-label="Stückzahl" />
+              </div>
+              <input type="date" required value={transactionForm.purchase_date} onChange={e => handleTransactionChange('purchase_date', e.target.value)} className="input-field" aria-label="Kaufdatum" />
+              <button type="submit" className="btn-primary w-full justify-center">Kauf speichern</button>
+            </form>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {error && (
             <div className="alert-error">
@@ -218,6 +313,7 @@ function PositionModal({ position, onSave, onClose }) {
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   )

@@ -161,6 +161,26 @@ Markdown mit Sektionen (via `##` Headings):
 
 ---
 
+## Portfolio Transaktions-History
+
+### `GET /api/portfolio/positions/{position_id}/transactions`
+Lädt die Käufe einer Position, absteigend nach Kaufdatum.
+
+### `POST /api/portfolio/positions/{position_id}/transactions`
+Fügt einen Kauf hinzu. Request:
+```json
+{
+  "entry_price": 180.5,
+  "shares": 2,
+  "purchase_date": "2026-08-21"
+}
+```
+
+### `DELETE /api/portfolio/positions/{position_id}/transactions/{transaction_id}`
+Löscht einen einzelnen historischen Kauf. Alle Endpunkte verwenden denselben Supabase-JWT-/SQLite-Fallback wie das Portfolio-CRUD.
+
+---
+
 ## Stock Data
 
 ### `GET /api/stock/{ticker}`

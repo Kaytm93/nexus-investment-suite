@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-08-21 — Portfolio Transaktions-History
+
+- `backend/database.py` — `position_transactions` mit Foreign Key, Initial-Kauf-Migration und SQLite-CRUD ergänzt.
+- `backend/supabase_db.py` / `schema.sql` — Supabase-Tabelle, Index, RLS-Policy und Transaktions-CRUD ergänzt.
+- `backend/main.py` / `models.py` — GET/POST/DELETE-Endpunkte und validierte Transaction-Modelle ergänzt.
+- `frontend-react/src/lib/api.js` / `pages/Portfolio.jsx` — Kaufhistorie im Positions-Modal mit Laden, Hinzufügen und Löschen als History-Tab umgesetzt.
+- `backend/test_transaction_history.py` — Round-Trip-Test für Initial-Kauf, Hinzufügen und Löschen.
+
+**Build:** ✅ `npm run build`
+
+---
+
 ## 2026-08-21 — Altair Cache-Indikator
 
 - `backend/main.py` und `models.py` — `cached_at` als UTC-ISO-8601-Zeitstempel für Cache-Hits und frisch gespeicherte Reports ergänzt.

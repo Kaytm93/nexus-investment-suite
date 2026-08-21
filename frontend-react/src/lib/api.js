@@ -119,6 +119,23 @@ export async function getPortfolioPerformance(period = '1y') {
   return apiFetch(`/api/portfolio/performance?period=${period}`)
 }
 
+export async function getPositionTransactions(positionId) {
+  return apiFetch(`/api/portfolio/positions/${positionId}/transactions`)
+}
+
+export async function addPositionTransaction(positionId, data) {
+  return apiFetch(`/api/portfolio/positions/${positionId}/transactions`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deletePositionTransaction(positionId, transactionId) {
+  return apiFetch(`/api/portfolio/positions/${positionId}/transactions/${transactionId}`, {
+    method: 'DELETE',
+  })
+}
+
 // ── Settings / API Keys ──────────────────────────────────────────────────────
 
 export async function testApiKey(provider, key) {

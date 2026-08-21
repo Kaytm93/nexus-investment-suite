@@ -9,6 +9,16 @@ Required env vars:
 
 NOTE: Before using, run this migration in the Supabase SQL Editor:
     ALTER TABLE positions ADD COLUMN IF NOT EXISTS current_price numeric(18,4);
+    CREATE TABLE IF NOT EXISTS position_transactions (
+        id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        position_id uuid REFERENCES positions(id) ON DELETE CASCADE NOT NULL,
+        entry_price numeric(18,4) NOT NULL,
+        shares numeric(18,6) NOT NULL,
+        purchase_date date NOT NULL,
+        created_at timestamptz DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS idx_position_transactions_position
+        ON position_transactions(position_id, purchase_date DESC, created_at DESC);
 """
 
 import os
@@ -164,16 +174,81 @@ def add_position(
         "sector": sector,
         "region": region,
     }).execute()
-    return _map_position(res.data[0])
+    raw = res.data[0]
+    add_position_transaction(
+        position_id=raw["id"],
+        entry_price=entry_price,
+        shares=shares,
+        purchase_date=purchase_date,
+    )
+    return _map_position(raw)
 
 
+def _map_transaction(row: Dict[str, Any]) -> Dict[str, Any]:
+    """Map a Supabase transaction row to the API representation."""
+    return {
+        "id": row["id"],
+        "position_id": row["position_id"],
+        "entry_price": float(row.get("entry_price", 0) or 0),
+        "shares": float(row.get("shares", 0) or 0),
+        "purchase_date": str(row["purchase_date"]),
+        "created_at": row.get("created_at"),
+    }
+
+
+def get_position_transactions(position_id: str) -> List[Dict[str, Any]]:
+    """Return purchase transactions for a position, newest purchase first."""
+    client = get_client()
+    res = (
+        client.table("position_transactions")
+        .select("*")
+        .eq("position_id", position_id)
+        .order("purchase_date", desc=True)
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return [_map_transaction(row) for row in (res.data or [])]
+
+
+def add_position_transaction(
+    position_id: str,
+    entry_price: float,
+    shares: float,
+    purchase_date: str,
+) -> Dict[str, Any]:
+    """Add a purchase transaction to an existing position."""
+    client = get_client()
+    res = client.table("position_transactions").insert({
+        "position_id": position_id,
+        "entry_price": entry_price,
+        "shares": shares,
+        "purchase_date": purchase_date,
+    }).execute()
+    return _map_transaction(res.data[0])
+
+
+def get_transaction(transaction_id: str) -> Optional[Dict[str, Any]]:
+    """Return one transaction or None."""
+    client = get_client()
+    res = (
+        client.table("position_transactions")
+        .select("*")
+        .eq("id", transaction_id)
+        .maybe_single()
+        .execute()
+    )
+    return _map_transaction(res.data) if res.data else None
+
+
+def delete_position_transaction(transaction_id: str) -> bool:
+    """Delete a purchase transaction by ID."""
+    client = get_client()
+    res = client.table("position_transactions").delete().eq("id", transaction_id).execute()
+    return bool(res.data)
 def update_position(
     position_id: str, updates: Dict[str, Any]
 ) -> Optional[Dict[str, Any]]:
-    """
-    Update specified fields.  Maps internal names → Supabase column names.
-    Returns updated record or None if not found.
-    """
+    """Update specified fields and return the updated position."""
     client = get_client()
     _FIELD_MAP = {
         "entry_price": "buy_price",

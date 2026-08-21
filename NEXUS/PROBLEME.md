@@ -1,6 +1,6 @@
 # NEXUS — Bug-Tracker & Problemliste
 
-> Letzte Aktualisierung: 2026-08-21 (Task 5)
+> Letzte Aktualisierung: 2026-08-21 (Task 6)
 
 ---
 
@@ -20,6 +20,7 @@ Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festge
 
 ## ✅ Gelöst
 
+- **Portfolio Transaktions-History** (2026-08-21 Task 6): Kaufhistorie über `position_transactions` ergänzt, inklusive initialem Kauf, SQLite-Fallback, Supabase-Unterstützung und History-Tab im Positions-Modal.
 - **Altair Cache-Indikator** (2026-08-21 Task 5): Der Altair-Response liefert `cached_at` als UTC-ISO-8601-Zeitstempel für Cache-Hits und frische Reports. Die Analysis-Seite zeigt das Report-Alter und stößt über „Neu analysieren" einen Request mit `force_refresh=true` an.
 - **Screener CSV-Export** (2026-08-21 Task 4): Elara-Ergebnistabelle kann mit UTF-8-BOM und Semikolon-Separator für deutsches Excel heruntergeladen werden.
 - **Analysis Regex-Parsing** (2026-08-21 Task 3): `extractReportSections` akzeptiert flexible deutsche/englische Labels und lokalisierte Zahlen mit Tausendertrennzeichen und Währungssymbolen. Fehlende oder ungültige Conviction-, Timing-, Preis- und DCF-Felder führen zu sicheren Fallbacks statt `NaN`/Crash.

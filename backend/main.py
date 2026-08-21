@@ -36,6 +36,10 @@ from database import (
     update_position as sqlite_update_position,
     delete_position as sqlite_delete_position,
     update_position_price as sqlite_update_position_price,
+    get_position_transactions as sqlite_get_position_transactions,
+    add_position_transaction as sqlite_add_position_transaction,
+    get_position_transaction as sqlite_get_position_transaction,
+    delete_position_transaction as sqlite_delete_position_transaction,
     save_altair_report, get_altair_report,
     save_elara_results, get_elara_results,
 )
@@ -44,6 +48,7 @@ import models
 from models import (
     ElaraRequest, AltairRequest,
     PortfolioPositionCreate, PortfolioPositionUpdate,
+    PortfolioTransactionCreate, PortfolioTransaction,
     PortfolioPosition, PerformanceData, PriceRefreshResult,
 )
 from search_service import SearchService
@@ -942,6 +947,14 @@ def _sqlite_id(position_id: str) -> int:
         raise HTTPException(status_code=400, detail="Ungültige Position-ID für lokalen Modus")
 
 
+def _serialize_transaction(transaction: dict) -> dict:
+    """Normalize SQLite integer IDs to the string IDs exposed by the API."""
+    result = dict(transaction)
+    result["id"] = str(result["id"])
+    result["position_id"] = str(result["position_id"])
+    return result
+
+
 # ── Portfolio ──────────────────────────────────────────────────────────────────
 
 @app.get("/api/portfolio", response_model=List[PortfolioPosition])
@@ -1252,7 +1265,92 @@ async def delete_position_alias(
 async def refresh_alias():
     return await refresh_prices()
 
+@app.get(
+    "/api/portfolio/positions/{position_id}/transactions",
+    response_model=List[PortfolioTransaction],
+)
+async def get_position_history(
+    position_id: str,
+    user_id: Optional[str] = Depends(get_current_user),
+):
+    """Return the purchase history for one portfolio position."""
+    portfolio_id = _resolve_portfolio(user_id)
+    if portfolio_id:
+        owned = any(
+            str(position["id"]) == position_id
+            for position in supabase_db.get_all_positions(portfolio_id)
+        )
+        if not owned:
+            raise HTTPException(status_code=404, detail=f"Position {position_id} nicht gefunden")
+        return supabase_db.get_position_transactions(position_id)
+
+    sqlite_position_id = _sqlite_id(position_id)
+    if database.get_position_by_id(sqlite_position_id) is not None:
+        return [_serialize_transaction(item) for item in sqlite_get_position_transactions(sqlite_position_id)]
+    raise HTTPException(status_code=404, detail=f"Position {position_id} nicht gefunden")
+
+
+@app.post(
+    "/api/portfolio/positions/{position_id}/transactions",
+    response_model=PortfolioTransaction,
+)
+async def create_position_history(
+    position_id: str,
+    transaction: PortfolioTransactionCreate,
+    user_id: Optional[str] = Depends(get_current_user),
+):
+    """Append a purchase to one portfolio position's history."""
+    portfolio_id = _resolve_portfolio(user_id)
+    if portfolio_id:
+        owned = any(
+            str(position["id"]) == position_id
+            for position in supabase_db.get_all_positions(portfolio_id)
+        )
+        if not owned:
+            raise HTTPException(status_code=404, detail=f"Position {position_id} nicht gefunden")
+        return supabase_db.add_position_transaction(
+            position_id, transaction.entry_price, transaction.shares, transaction.purchase_date
+        )
+
+    sqlite_position_id = _sqlite_id(position_id)
+    if database.get_position_by_id(sqlite_position_id) is None:
+        raise HTTPException(status_code=404, detail=f"Position {position_id} nicht gefunden")
+    return _serialize_transaction(sqlite_add_position_transaction(
+        sqlite_position_id, transaction.entry_price, transaction.shares, transaction.purchase_date
+    ))
+
+
+@app.delete("/api/portfolio/positions/{position_id}/transactions/{transaction_id}")
+async def delete_position_history(
+    position_id: str,
+    transaction_id: str,
+    user_id: Optional[str] = Depends(get_current_user),
+):
+    """Delete one purchase from a position's history."""
+    portfolio_id = _resolve_portfolio(user_id)
+    if portfolio_id:
+        owned = any(
+            str(position["id"]) == position_id
+            for position in supabase_db.get_all_positions(portfolio_id)
+        )
+        transaction = supabase_db.get_transaction(transaction_id)
+        if not owned or not transaction or str(transaction["position_id"]) != position_id:
+            raise HTTPException(status_code=404, detail="Transaktion nicht gefunden")
+        deleted = supabase_db.delete_position_transaction(transaction_id)
+    else:
+        sqlite_position_id = _sqlite_id(position_id)
+        transaction = sqlite_get_position_transaction(_sqlite_id(transaction_id))
+        if not transaction or transaction["position_id"] != sqlite_position_id:
+            raise HTTPException(status_code=404, detail="Transaktion nicht gefunden")
+        deleted = sqlite_delete_position_transaction(_sqlite_id(transaction_id))
+
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Transaktion nicht gefunden")
+    return {"success": True, "deleted_id": transaction_id}
+
+
 # ── Stock data endpoints ─────────────────────────────────────────────────────────
+
 
 @app.get("/api/stock/{ticker}")
 async def get_stock(ticker: str):
