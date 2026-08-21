@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import ApiKeyGate from '../components/ApiKeyGate'
+import WatchlistButton from '../components/WatchlistButton'
 import { runElaraScreener } from '../lib/api'
 import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
@@ -115,6 +116,7 @@ function ResultsTable({ markdown, onTickerClick }) {
   }
 
   const tickerIdx = headers.findIndex(h => h.toLowerCase() === 'ticker')
+  const nameIdx = headers.findIndex(h => /name|unternehmen|firma/i.test(h))
 
   return (
     <div className="table-container">
@@ -124,7 +126,8 @@ function ResultsTable({ markdown, onTickerClick }) {
             {headers.map((h, i) => (
               <th key={i}>
                 <button
-                  className="flex items-center gap-1 hover:text-slate-700 transition-colors"
+                  className="flex items-center gap-1 transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                   onClick={() => handleSort(h)}
                 >
                   {h}
@@ -148,12 +151,10 @@ function ResultsTable({ markdown, onTickerClick }) {
                   return (
                     <td key={ci}>
                       {ci === tickerIdx ? (
-                        <button
-                          onClick={() => onTickerClick(cell)}
-                          className="font-mono font-semibold text-primary hover:underline cursor-pointer"
-                        >
-                          {cell}
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => onTickerClick(cell)} className="font-mono font-semibold text-primary hover:underline cursor-pointer">{cell}</button>
+                          <WatchlistButton ticker={cell} name={row[nameIdx]} />
+                        </div>
                       ) : (
                         <span
                           className={/^[+-]?\d+\.?\d*%?$/.test(cell.trim()) && !['#', '1'].includes(cell.trim()) ? 'num' : ''}
@@ -358,7 +359,7 @@ export default function Screener() {
                 <div>
                   <label className="label">
                     Ausschlüsse
-                    <span className="ml-1 text-slate-400 font-normal">(optional)</span>
+                    <span className="ml-1 font-normal" style={{ color: 'var(--text-muted)' }}>(optional)</span>
                   </label>
                   <input
                     type="text"

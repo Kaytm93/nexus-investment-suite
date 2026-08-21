@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { fetchMarketMovers, openMarketStream } from '../lib/api'
+import { useWatchlist } from '../context/WatchlistContext'
+import WatchlistButton from '../components/WatchlistButton'
 import StockChart from '../components/StockChart'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -157,7 +159,9 @@ function MoverRow({ item, isGainer }) {
           </div>
         </div>
       </div>
-      <div className="text-right shrink-0">
+      <div className="flex items-center gap-2">
+        <WatchlistButton ticker={item.ticker} name={item.name} />
+        <div className="text-right shrink-0">
         <p className="text-sm font-mono font-medium tabular" style={{ color: 'var(--text)' }}>
           {item.price != null
             ? item.price.toLocaleString('de-DE', { minimumFractionDigits: 2 })
@@ -169,6 +173,7 @@ function MoverRow({ item, isGainer }) {
         >
           {item.change == null || isNaN(item.change) ? '—' : `${isGainer ? '+' : ''}${item.change.toFixed(2)}%`}
         </p>
+      </div>
       </div>
     </Link>
   )
@@ -417,6 +422,7 @@ function ConvictionRing() {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const { user } = useAuth()
+  const { items: watchlistItems } = useWatchlist()
   const [indices, setIndices] = useState([])
   const [gainers, setGainers] = useState([])
   const [losers, setLosers] = useState([])
@@ -815,6 +821,33 @@ export default function Home() {
             </div>
           )}
         </section>
+
+        {user && (
+          <section>
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-bold" style={{ fontFamily: "'Boska', serif", color: 'var(--text)' }}>Meine Watchlist</h2>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Deine beobachteten Titel auf einen Blick</p>
+              </div>
+              <Link to="/analyse" className="text-xs flex items-center gap-1" style={{ color: 'var(--primary)' }}>Analyse öffnen <ChevronRight size={12} /></Link>
+            </div>
+            {watchlistItems.length === 0 ? (
+              <div className="rounded-2xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Noch keine Titel gespeichert. Klicke auf einen Stern bei einem Ticker.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {watchlistItems.map(item => (
+                  <Link key={item.ticker} to={`/analyse?ticker=${item.ticker}`} className="rounded-2xl p-4 flex items-center justify-between" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                    <span><span className="font-mono font-semibold" style={{ color: 'var(--text)' }}>{item.ticker}</span><span className="block text-xs mt-1 truncate max-w-[150px]" style={{ color: 'var(--text-muted)' }}>{item.name || 'Aktie'}</span></span>
+                    <WatchlistButton ticker={item.ticker} name={item.name} />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+        )}
 
         {/* ── WIE ES FUNKTIONIERT ──────────────────────────────────────── */}
         <section ref={featuresRef}>

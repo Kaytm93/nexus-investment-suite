@@ -66,6 +66,16 @@ CREATE TABLE IF NOT EXISTS positions (
 CREATE INDEX IF NOT EXISTS idx_positions_portfolio ON positions(portfolio_id);
 CREATE INDEX IF NOT EXISTS idx_positions_ticker    ON positions(ticker);
 
+CREATE TABLE IF NOT EXISTS watchlist (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  ticker text NOT NULL,
+  name text,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(user_id, ticker)
+);
+CREATE INDEX IF NOT EXISTS idx_watchlist_user ON watchlist(user_id, created_at DESC);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- POSITION TRANSACTION HISTORY
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -130,7 +140,8 @@ CREATE INDEX IF NOT EXISTS idx_cache_lookup ON analysis_cache(cache_type, cache_
 
 ALTER TABLE profiles    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolios  ENABLE ROW LEVEL SECURITY;
-ALTER TABLE positions   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE positions  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE watchlist   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE position_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE api_keys    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analysis_cache ENABLE ROW LEVEL SECURITY;
@@ -148,6 +159,9 @@ CREATE POLICY "positions_owner" ON positions
   FOR ALL USING (
     portfolio_id IN (SELECT id FROM portfolios WHERE user_id = auth.uid())
   );
+
+CREATE POLICY "watchlist_owner" ON watchlist
+  FOR ALL USING (auth.uid() = user_id);
 
 CREATE POLICY "position_transactions_owner" ON position_transactions
   FOR ALL USING (

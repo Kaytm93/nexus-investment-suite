@@ -1,4 +1,12 @@
-# NEXUS — Changelog
+## 2026-08-21 — Watchlist
+
+- `backend/database.py` / `backend/supabase_db.py` — Watchlist-CRUD mit Ticker-Normalisierung, Idempotenz und Supabase/SQLite-Fallback ergänzt.
+- `backend/main.py` / `schema.sql` — Authentifizierte Watchlist-Endpunkte und User-isolierte Supabase-Tabelle mit RLS ergänzt.
+- `frontend-react/src/context/WatchlistContext.jsx` / `components/WatchlistButton.jsx` — Persistenter Stern-Toggle ohne localStorage/sessionStorage.
+- `Home.jsx`, `Screener.jsx`, `Analysis.jsx` — Sterne an Movers/Screening-Tickern/Analyse sowie Watchlist-Sektion auf Home ergänzt.
+- Verifiziert: Watchlist-Unit-Test, Python-Kompilierung und `npm run build` erfolgreich.
+
+---
 
 > Rekonstruiert aus Git-History + Code-Stand. Neueste Einträge oben.
 

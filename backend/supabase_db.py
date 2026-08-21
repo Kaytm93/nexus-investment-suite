@@ -295,3 +295,22 @@ def delete_position(position_id: str) -> bool:
     client = get_client()
     res = client.table("positions").delete().eq("id", position_id).execute()
     return bool(res.data)
+
+
+def get_watchlist(user_id: str) -> List[Dict[str, Any]]:
+    res = get_client().table("watchlist").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+    return res.data or []
+
+
+def add_watchlist_item(user_id: str, ticker: str, name: Optional[str] = None) -> Dict[str, Any]:
+    normalized = ticker.upper().strip()
+    res = get_client().table("watchlist").upsert(
+        {"user_id": user_id, "ticker": normalized, "name": name},
+        on_conflict="user_id,ticker",
+    ).execute()
+    return res.data[0]
+
+
+def delete_watchlist_item(user_id: str, ticker: str) -> bool:
+    res = get_client().table("watchlist").delete().eq("user_id", user_id).eq("ticker", ticker.upper().strip()).execute()
+    return bool(res.data)

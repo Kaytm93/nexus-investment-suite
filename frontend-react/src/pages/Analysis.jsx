@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import ApiKeyGate from '../components/ApiKeyGate'
 import ConvictionGauge from '../components/ConvictionGauge'
 import StockChart from '../components/StockChart'
+import WatchlistButton from '../components/WatchlistButton'
 import { runAltairAnalysis, searchTicker, fetchStockData, fetchHistory, buildWsUrl } from '../lib/api'
 import { gsap } from 'gsap'
 import {
@@ -492,6 +493,7 @@ export default function Analysis() {
                   Stand: {formatCacheAge(report.cached_at)}
                 </span>
               )}
+              <WatchlistButton ticker={ticker} name={report?.company_name || report?.name} />
               <button
                 onClick={() => handleAnalyse(ticker, true)}
                 disabled={loading}

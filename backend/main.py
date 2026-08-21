@@ -42,6 +42,9 @@ from database import (
     add_position_transaction as sqlite_add_position_transaction,
     get_position_transaction as sqlite_get_position_transaction,
     delete_position_transaction as sqlite_delete_position_transaction,
+    get_watchlist as sqlite_get_watchlist,
+    add_watchlist_item as sqlite_add_watchlist_item,
+    delete_watchlist_item as sqlite_delete_watchlist_item,
     save_altair_report, get_altair_report,
     save_elara_results, get_elara_results,
 )
@@ -994,6 +997,31 @@ def _serialize_transaction(transaction: dict) -> dict:
     result["id"] = str(result["id"])
     result["position_id"] = str(result["position_id"])
     return result
+
+
+# ── Watchlist ───────────────────────────────────────────────────────────────────
+
+@app.get("/api/watchlist")
+async def get_watchlist(user_id: Optional[str] = Depends(get_current_user)):
+    return supabase_db.get_watchlist(user_id) if user_id else sqlite_get_watchlist()
+
+
+@app.post("/api/watchlist")
+async def add_watchlist(payload: dict, user_id: Optional[str] = Depends(get_current_user)):
+    ticker = str(payload.get("ticker", "")).upper().strip()
+    if not ticker or len(ticker) > 20 or not re.match(r"^[A-Z0-9.\\-\\^=]+$", ticker):
+        raise HTTPException(status_code=422, detail="Ungültiger Ticker")
+    name = payload.get("name")
+    return supabase_db.add_watchlist_item(user_id, ticker, name) if user_id else sqlite_add_watchlist_item(ticker, name)
+
+
+@app.delete("/api/watchlist/{ticker}")
+async def remove_watchlist(ticker: str, user_id: Optional[str] = Depends(get_current_user)):
+    normalized = ticker.upper().strip()
+    deleted = supabase_db.delete_watchlist_item(user_id, normalized) if user_id else sqlite_delete_watchlist_item(normalized)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Ticker nicht in Watchlist")
+    return {"success": True, "ticker": normalized}
 
 
 # ── Portfolio ──────────────────────────────────────────────────────────────────

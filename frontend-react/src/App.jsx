@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { AuthProvider } from './context/AuthContext'
+import { WatchlistProvider } from './context/WatchlistContext'
 import Header from './components/Header'
 import Home from './pages/Home'
 import Auth from './pages/Auth'
@@ -187,7 +188,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <WatchlistProvider>
+          <AppRoutes />
+        </WatchlistProvider>
       </AuthProvider>
     </BrowserRouter>
   )

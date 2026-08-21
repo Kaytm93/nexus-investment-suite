@@ -105,6 +105,8 @@ Ziel: Research-Qualität wie professionelle Analysten — kostenlos, BYOK (Bring
 |---|---|---|
 | `components/Header.jsx` | ✅ | Sticky Nav, Scroll-aware Glassmorphism, Backend-Health Badge (inkl. Cold-Start Spinner + 5s-Retry bis 60s), User-Dropdown mit Fade+Scale Animation, Mobile Hamburger, /chat Sparkles-Icon |
 | `components/ApiKeyGate.jsx` | ✅ | Blur-Overlay + Hinweis wenn kein API-Key gesetzt (`hasApiKey` aus AuthContext) |
+| `components/WatchlistButton.jsx` | ✅ | Persistenter Stern-Toggle für Watchlist-Ticker |
+| `context/WatchlistContext.jsx` | ✅ | Lädt und mutiert Watchlist über Backend, ohne Browser-Storage |
 | `components/ConvictionGauge.jsx` | ✅ | SVG Arc Gauge 0–7, GSAP Counter + Arc-Animation, `useGSAP()` |
 | `components/StockChart.jsx` | ✅ | Recharts Area/Line Chart, dark-styled, Optional Area-Füllung |
 | `components/PerformanceChart.jsx` | ✅ | Portfolio vs. S&P 500 vs. MSCI World Linienchart. Dark Theme (2026-04-03). Demo-Daten Fallback mit Badge. |
@@ -143,6 +145,9 @@ Alle Endpunkte in `backend/main.py`. Basis-URL: `http://localhost:7842` (oder Re
 | `GET` | `/api/keys/status` | Welche Keys sind gesetzt? |
 | `POST` | `/api/keys/test` | Key testen |
 | `POST` | `/api/keys/{provider}` | Key speichern (`claude`, `tavily`, `alphavantage`, `ollama`) |
+| `GET` | `/api/watchlist` | Eigene Watchlist laden (Supabase oder SQLite-Fallback) |
+| `POST` | `/api/watchlist` | Ticker zur Watchlist hinzufügen |
+| `DELETE` | `/api/watchlist/{ticker}` | Ticker aus Watchlist entfernen |
 
 ---
 
@@ -250,6 +255,7 @@ WebSocket nur für Progress-Anzeige.
 10. ~~Altair Cache-Indikator~~ ✅ erledigt 2026-08-21 (`cached_at` ISO-8601, Alters-Badge, Force-Refresh-Button)
 11. ~~Portfolio Transaktions-History~~ ✅ erledigt 2026-08-21 (SQLite/Supabase-Tabelle, CRUD-Endpunkte, History-Tab im Positions-Modal)
 12. ~~Echte Live-Kurse~~ ✅ erledigt 2026-08-21 (60s-yFinance-TTL-Cache, SSE `/api/market/stream`, Home + Portfolio live)
+13. ~~Watchlist~~ ✅ erledigt 2026-08-21 (Stars auf Home/Screener/Analysis, Supabase/SQLite-Persistenz, Watchlist-Sektion auf Home)
 
 ➡️ Aktuelle, vollständige Task-Queue für Agent-Sessions: siehe [[DASHBOARD]] Abschnitt „📋 Was Claude beim nächsten Mal tun soll" (dort werden auch Roadmap-Features wie CSV-Export, Cache-Indikator, Watchlist, Transaktions-History, Live-Kurse der Reihe nach abgearbeitet).
 

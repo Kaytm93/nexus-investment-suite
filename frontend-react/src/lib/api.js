@@ -144,6 +144,19 @@ export async function deletePositionTransaction(positionId, transactionId) {
   })
 }
 
+// ── Watchlist ────────────────────────────────────────────────────────────────
+export async function getWatchlist() {
+  return apiFetch('/api/watchlist')
+}
+
+export async function addToWatchlist(ticker, name) {
+  return apiFetch('/api/watchlist', { method: 'POST', body: JSON.stringify({ ticker: ticker.toUpperCase().trim(), name }) })
+}
+
+export async function removeFromWatchlist(ticker) {
+  return apiFetch(`/api/watchlist/${encodeURIComponent(ticker.toUpperCase().trim())}`, { method: 'DELETE' })
+}
+
 // ── Settings / API Keys ──────────────────────────────────────────────────────
 
 export async function testApiKey(provider, key) {

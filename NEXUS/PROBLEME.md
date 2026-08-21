@@ -20,6 +20,8 @@ Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festge
 
 ## ✅ Gelöst
 
+- **Watchlist** (2026-08-21 Task 8): Sterne auf Home, Screener und Analysis persistieren Ticker über Supabase oder SQLite-Fallback; Home zeigt die eigene Watchlist.
+
 - **Echte Live-Kurse** (2026-08-21 Task 7): Gemeinsamer yFinance-Markt-Poller mit 60s-TTL-Cache und SSE-Endpoint `/api/market/stream`; Home-Indizes und Portfolio-Kurse reagieren auf Live-Snapshots. NaN-/Infinity-Guards verhindern ungültige Preise in Kurs- und Sparkline-Daten.
 
 - **Portfolio Transaktions-History** (2026-08-21 Task 6): Kaufhistorie über `position_transactions` ergänzt, inklusive initialem Kauf, SQLite-Fallback, Supabase-Unterstützung und History-Tab im Positions-Modal.

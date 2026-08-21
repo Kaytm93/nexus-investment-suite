@@ -84,6 +84,13 @@ def init_db() -> None:
             CREATE INDEX IF NOT EXISTS idx_position_transactions_position
                 ON position_transactions (position_id, purchase_date DESC, id DESC);
 
+            CREATE TABLE IF NOT EXISTS watchlist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ticker TEXT NOT NULL UNIQUE,
+                name TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+
             INSERT INTO position_transactions (position_id, entry_price, shares, purchase_date)
             SELECT p.id, p.entry_price, p.shares, p.purchase_date
             FROM positions p
@@ -92,6 +99,36 @@ def init_db() -> None:
             );
         """)
         conn.commit()
+    finally:
+        conn.close()
+
+
+def get_watchlist() -> List[Dict[str, Any]]:
+    conn = _get_connection()
+    try:
+        rows = conn.execute("SELECT * FROM watchlist ORDER BY created_at DESC, id DESC").fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+
+def add_watchlist_item(ticker: str, name: Optional[str] = None) -> Dict[str, Any]:
+    normalized = ticker.upper().strip()
+    conn = _get_connection()
+    try:
+        conn.execute("INSERT INTO watchlist (ticker, name) VALUES (?, ?) ON CONFLICT(ticker) DO UPDATE SET name = COALESCE(excluded.name, watchlist.name)", (normalized, name))
+        conn.commit()
+        return dict(conn.execute("SELECT * FROM watchlist WHERE ticker = ?", (normalized,)).fetchone())
+    finally:
+        conn.close()
+
+
+def delete_watchlist_item(ticker: str) -> bool:
+    conn = _get_connection()
+    try:
+        cursor = conn.execute("DELETE FROM watchlist WHERE ticker = ?", (ticker.upper().strip(),))
+        conn.commit()
+        return cursor.rowcount > 0
     finally:
         conn.close()
 
