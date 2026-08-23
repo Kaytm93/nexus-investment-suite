@@ -1,16 +1,16 @@
 # NEXUS — Dashboard
 
-> Zuletzt aktualisiert: 2026-08-21 · Task 8 Watchlist abgeschlossen
+> Zuletzt aktualisiert: 2026-08-23 · Task 9 ProtectedRoute-Bluescreen behoben
 
 ---
 
 ## 🚦 Projektstatus
 
-**Vault-Sync 2026-08-21: Task 8 Watchlist umgesetzt. Sterne auf Home/Screener/Analysis speichern Ticker über Supabase oder SQLite-Fallback; Home zeigt die eigene Watchlist. Build ✅.**
+**Vault-Sync 2026-08-23: Task 9 ProtectedRoute-Bluescreen behoben. `useAuth` wurde in `App.jsx` korrekt importiert; geschützte Routes rendern bzw. redirecten wieder. Regressionstest + Build ✅.**
 
 ### Was gerade läuft
 
-- Tasks 1–8 sind abgeschlossen; Frontend-Build, Watchlist-Test und Python-Kompilierung sind erfolgt.
+- Tasks 1–9 sind abgeschlossen; Frontend-Build, Regressionstest für ProtectedRoutes und lokaler Route-Smoke-Test sind erfolgt.
 - Die Queue ist für diese Session leer; optionale Roadmap-Ideen bleiben offen.
 
 ---
@@ -77,6 +77,7 @@
 6. [x] **Portfolio Transaktions-History** — Kaufhistorie je Position (Backend: Tabelle/Feld + Endpunkte, Supabase + SQLite-Fallback; Frontend: History-Tab im Positions-Modal). Abgeschlossen 2026-08-21.
 7. [x] **Echte Live-Kurse** — Backend-Polling yFinance alle 60s (Cache mit TTL), SSE-Endpoint `/api/market/stream`; Home Indices + Portfolio aktualisieren sich live. yFinance-NaN-Guards beachten ([[PROBLEME]]). Abgeschlossen 2026-08-21.
 8. [x] **Watchlist** — Stars auf Stock-Cards (Home/Screener/Analysis), persistiert in Supabase (Fallback SQLite), Watchlist-Sektion auf Home. Abgeschlossen 2026-08-21.
+9. [x] **ProtectedRoute-Bluescreen** — Fehlenden `useAuth`-Import in `App.jsx` ergänzt, Regressionstest + Route-Smoke-Test hinzugefügt. Abgeschlossen 2026-08-23.
 
 **Danach (optional, aus 💡 Ideen):** Onboarding-Flow, Dark/Light Toggle, Mobile-Nav, PDF-Export, Multi-Language, Portfolio-Alerts.
 

@@ -1,6 +1,6 @@
 # NEXUS — Bug-Tracker & Problemliste
 
-> Letzte Aktualisierung: 2026-08-21 (Task 7)
+> Letzte Aktualisierung: 2026-08-23 (Task 9)
 
 ---
 
@@ -19,6 +19,8 @@ Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festge
 ---
 
 ## ✅ Gelöst
+
+- **ProtectedRoute-Bluescreen auf geschützten Pages** (2026-08-23): `App.jsx` verwendete `useAuth()` in `ProtectedRoute`, importierte den Hook aber nicht. Dadurch crashte jede geschützte Route vor der darunterliegenden ErrorBoundary und ließ `#root` leer. Fix: `useAuth` gemeinsam mit `AuthProvider` importiert; Regressionstest `frontend-react/tests/protected-route.test.mjs` ergänzt.
 
 - **Watchlist** (2026-08-21 Task 8): Sterne auf Home, Screener und Analysis persistieren Ticker über Supabase oder SQLite-Fallback; Home zeigt die eigene Watchlist.
 

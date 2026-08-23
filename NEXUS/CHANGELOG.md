@@ -1,3 +1,12 @@
+## 2026-08-23 — ProtectedRoute-Bluescreen behoben
+
+- `frontend-react/src/App.jsx` — fehlenden `useAuth`-Import ergänzt. `ProtectedRoute` verwendet den Hook jetzt aus `AuthContext`, sodass `/screener`, `/analyse`, `/portfolio`, `/settings` und `/chat` wieder korrekt rendern bzw. auf `/auth` umleiten.
+- `frontend-react/tests/protected-route.test.mjs` — Regressionstest ergänzt, der den Hook-Import und die ProtectedRoute-Nutzung absichert.
+- `frontend-react/package.json` — `npm test` als Node-Test-Runner ergänzt.
+- Verifiziert: `npm test`, `npm run build` und lokaler Route-Smoke-Test erfolgreich.
+
+---
+
 ## 2026-08-21 — Watchlist
 
 - `backend/database.py` / `backend/supabase_db.py` — Watchlist-CRUD mit Ticker-Normalisierung, Idempotenz und Supabase/SQLite-Fallback ergänzt.

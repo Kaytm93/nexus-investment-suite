@@ -1,6 +1,6 @@
 # NEXUS Investment Suite — Vollständiger Projektkontext
 
-> Letzte Aktualisierung: 2026-08-21 | Stand: Echte Live-Kurse + Portfolio Transaktions-History + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
+> Letzte Aktualisierung: 2026-08-23 | Stand: ProtectedRoute-Bluescreen behoben + Regressionstest ergänzt; zuvor Echte Live-Kurse + Portfolio Transaktions-History + Settings Key-Vorschau + Bundle-Splitting + Recovery-Flow + GSAP Refactor
 
 ---
 
