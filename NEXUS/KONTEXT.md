@@ -63,7 +63,7 @@ Ziel: Research-Qualität wie professionelle Analysten — kostenlos, BYOK (Bring
 
 | Layer | Plattform | Details |
 |---|---|---|
-| Frontend | Vercel | Auto-Deploy bei push auf `main`. SPA-Routing via `vercel.json` |
+| Frontend | Vercel | Git-Verbindung vorhanden; der Push von `a231adf` löste am 2026-08-23 keinen Auto-Deploy aus. Ein temporärer `main`-Deploy-Hook wurde für die Reparatur verwendet und danach widerrufen. |
 | Backend | Render | FastAPI, Port 7842. Env-Vars: `GROQ_API_KEY`, `TAVILY_API_KEY` |
 
 ### Env-Variablen

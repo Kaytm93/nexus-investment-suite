@@ -53,6 +53,8 @@ Task 2 war rein visuell; es wurden keine neuen Bugs oder Einschränkungen festge
 
 ## ⚠️ Bekannte Einschränkungen (kein Bug, aber wichtig)
 
+- **Vercel Git-Auto-Deploy**: Das Repository ist in Vercel verbunden, aber der Push von `a231adf` löste am 2026-08-23 keinen neuen Deployment-Lauf aus. Für die Reparatur wurde ein temporärer `main`-Deploy-Hook verwendet und nach erfolgreichem Build widerrufen.
+
 - **Groq-Key unter "claude"-Slot**: Historisch bedingt. Backend speichert User-eigene Groq-Keys unter dem Slot-Namen `"claude"`. NICHT umbenennen.
 - **Server-Key GROQ_API_KEY ist Pflicht auf Render**: Ohne diesen Env-Var läuft der AI-Service auf Ollama-Fallback.
 - **yFinance Ratelimits**: Gibt manchmal `NaN` zurück bei wenig gehandelten Titeln oder nach schnellen aufeinanderfolgenden Requests.

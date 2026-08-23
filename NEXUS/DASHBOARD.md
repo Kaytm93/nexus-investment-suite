@@ -51,7 +51,7 @@
 
 | Layer | Plattform | Status |
 |---|---|---|
-| Frontend | Vercel (auto-deploy bei push auf `main`) | ✅ live |
+| Frontend | Vercel (Git verbunden; Push-Auto-Deploy am 2026-08-23 nicht ausgelöst, Deploy Hook als Fallback genutzt) | ✅ live |
 | Backend | Render (FastAPI, Port 7842) | ✅ konfiguriert |
 | Datenbank | Supabase | ✅ Auth + Portfolio |
 

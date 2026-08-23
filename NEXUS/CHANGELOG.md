@@ -4,6 +4,7 @@
 - `frontend-react/tests/protected-route.test.mjs` — Regressionstest ergänzt, der den Hook-Import und die ProtectedRoute-Nutzung absichert.
 - `frontend-react/package.json` — `npm test` als Node-Test-Runner ergänzt.
 - Verifiziert: `npm test`, `npm run build` und lokaler Route-Smoke-Test erfolgreich.
+- Vercel-Git-Auto-Deploy reagierte nicht auf den Push; ein temporärer `main`-Deploy-Hook wurde für die Production-Aktualisierung genutzt und danach widerrufen.
 
 ---
 
